@@ -53,5 +53,19 @@ class TestResumoLogs(unittest.TestCase):
         self.assertEqual((g["urnas_depois_18h_2t"], g["urnas_depois_18h_1t"]), (1, 0))
 
 
+class TestFaixasBrasil(unittest.TestCase):
+    def test_converte_fuso_e_separa_exterior(self):
+        linhas = [
+            {"uf": "sp", "delta_h": "0.0", "log_horarios_apos_corte": "170000;170001;170630"},   # 17:00:00 não conta
+            {"uf": "am", "delta_h": "-1.0", "log_horarios_apos_corte": "160200;155900"},          # 17:02 e 16:59 de Brasília
+            {"uf": "zz", "delta_h": "-4.0", "log_horarios_apos_corte": "130500"},                 # 17:05 de Brasília
+            {"uf": "rj", "delta_h": "", "log_horarios_apos_corte": "191500"},                     # cai na última janela
+        ]
+        r = pausa.faixas_brasil(linhas)
+        self.assertEqual((r["brasil"], r["exterior"]), (4, 1))
+        self.assertEqual(r["faixas"][:2], [2, 1])
+        self.assertEqual(r["faixas"][-1], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

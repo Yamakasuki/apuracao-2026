@@ -272,26 +272,34 @@ function renderPausa() {
     if (detalhe) k.append(el('div', 'kpi__detalhe', detalhe));
     kpis.append(k);
   };
-  if (t2) kpi('Vantagem de Lula', num(margem), 'votos, resultado oficial');
-  if (t2) kpi('Votos depois das 17h no Brasil', num(F.brasil), `${pct((100 * F.brasil) / margem, 2)} da vantagem (todas as urnas)`);
-  else kpi('Votos depois das 17h no Brasil', num(brasil), 'CNN Brasil, logs das urnas');
-  kpi('Nas 3 cidades da Bahia, depois das 17h', num(depois), `${pct((100 * depois) / votos, 2)} dos votos dessas cidades`);
-  kpi('Nas 3 cidades, depois das 17h10', num(depois1710), `último voto às ${(t2 ? cid.ultimo_2t : '–').slice(0, 5)}`);
-  if (!t2) kpis.lastChild.lastChild.remove();
+  const B = P.brasil_apos_17h;
+  const fila = B.faixas[0];
+  if (t2) {
+    kpi('Votos depois das 17h no Brasil', num(B.brasil), `${pct((100 * B.brasil) / margem, 2)} da vantagem de Lula (todas as urnas)`);
+    kpi('Entre 17h00 e 17h05', num(fila), `${pct((100 * fila) / B.brasil, 0)} deles: o fim da fila`);
+    kpi('Depois das 17h05', num(B.brasil - fila), 'o que sobra para a prorrogação');
+    kpi('Vantagem de Lula', num(margem), 'votos, resultado oficial');
+  } else {
+    kpi('Votos depois das 17h no Brasil', num(brasil), 'CNN Brasil, logs das urnas');
+    kpi('Nas 3 cidades da Bahia, depois das 17h', num(depois), `${pct((100 * depois) / votos, 2)} dos votos dessas cidades`);
+    kpi('Nas 3 cidades, depois das 17h10', num(depois1710), 'fila do 1º turno, sem prorrogação');
+  }
 
   $('#pausa-logs').textContent = t2
-    ? `Cada urna guarda um log com o horário de cada voto. Baixei os logs de todas as ${num(cid.urnas)} urnas de Salvador, Feira de Santana ` +
-      `e Lauro de Freitas, onde a prorrogação foi pedida. No 2º turno, ${num(depois)} votos foram registrados depois das 17h ` +
-      `(${pct((100 * depois) / votos, 2)} dos votos dessas cidades), quase todos nos primeiros 10 minutos, o fim da fila. ` +
-      `Depois das 17h10 foram ${num(depois1710)} votos, e o último às ${cid.ultimo_2t.slice(0, 5)}.`
+    ? `Cada urna guarda um log com o horário de cada voto. Somando o log de todas as urnas do país, ${num(B.brasil)} pessoas votaram depois das 17h ` +
+      `(0,03% dos ${num(P.turno2.brasil.comparecimento)} votos). ${num(fila)} delas votaram até 17h05: quem já estava na fila às 17h, o que acontece em ` +
+      `toda eleição. Depois das 17h05 foram ${num(B.brasil - fila)}, espalhados até as 19h. No exterior foram mais ${num(B.exterior)}, ` +
+      'porque lá a votação vai até as 17h do horário local, que nas Américas cai depois das 17h de Brasília.'
     : `Nas mesmas urnas de Salvador, Feira de Santana e Lauro de Freitas, no 1º turno, ${num(depois)} votos foram registrados depois das 17h ` +
       `(${pct((100 * depois) / votos, 2)} dos votos), ${num(depois1710)} deles depois das 17h10. Eram eleitores na fila: no 1º turno se votava em 5 cargos e a votação demorava mais.`;
-  $('#pausa-turno-rotulo').textContent = t2 ? '2º turno' : '1º turno';
+  $('#pausa-grafico-legenda').textContent = t2
+    ? 'no Brasil inteiro, a cada 5 minutos (todas as urnas, sem o exterior)'
+    : 'nas urnas de Salvador, Feira de Santana e Lauro de Freitas, a cada 10 minutos (1º turno)';
   const am = P.logs.amostra_brasil;
   $('#pausa-brasil').textContent = t2
-    ? `E no resto do país? Numa amostra aleatória de ${num(am.urnas)} urnas, ${num(am.depois_2t)} votos foram dados depois do fechamento, ` +
-      `o que projeta uns ${num(P.logs.estimativa_resto_brasil.depois_2t)} no Brasil (fora as três cidades). Isso bate com as contagens feitas com os logs ` +
-      `de todas as urnas: ${num(IMPRENSA[2])} segundo o g1 e 34.330 segundo a CNN Brasil.`
+    ? `E onde a prorrogação foi pedida? Nas ${num(cid.urnas)} urnas de Salvador, Feira de Santana e Lauro de Freitas, li o log de cada uma: ` +
+      `${num(depois)} votos depois das 17h (${pct((100 * depois) / votos, 2)} dos votos dessas cidades), ${num(depois1710)} deles depois das 17h10, ` +
+      `e o último às ${cid.ultimo_2t.slice(0, 5)}.`
     : `Na amostra aleatória de ${num(am.urnas)} urnas do resto do país, ${num(am.depois_1t)} votos foram dados depois do fechamento no 1º turno.`;
 
   $('#comparacao').hidden = !t2;
@@ -317,10 +325,15 @@ function renderPausa() {
     `para o resto do país, uma amostra aleatória de ${num(am.urnas)} urnas. Script: pipeline/logs_urna.py.`;
 
   const t = G.tokens();
-  const n = faixas.length;
+  const serie = t2 ? B.faixas : faixas;
+  const passo = t2 ? B.janela_min : 10;
+  const rotulo = k => {
+    const m = k * passo;
+    return `${17 + Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}`;
+  };
   grafico('g-logs').setOption(G.opcoesLogs(t, {
-    rotulos: faixas.map((_, k) => (k === n - 1 ? '19h20+' : `${17 + Math.floor(k / 6)}h${String((k % 6) * 10).padStart(2, '0')}`)),
-    valores: faixas, nome: t2 ? '2º turno' : '1º turno', animar: !semMovimento.matches, estreito: innerWidth < 600,
+    rotulos: serie.map((_, k) => (k === serie.length - 1 ? `${rotulo(k)}+` : rotulo(k))),
+    valores: serie, nome: t2 ? '2º turno' : '1º turno', animar: !semMovimento.matches, estreito: innerWidth < 600,
   }), true);
 
   const grupos = ['cidades', 'resto_uf', 'resto_br'];
@@ -681,9 +694,11 @@ function renderTabela(qual) {
     linhas = ['cidades', 'resto_uf', 'resto_br', 'brasil'].map(g => [ROTULO_GRUPO[g] ?? 'Brasil', pct(taxa(PAUSA.turno1[g]), 2),
       pct(taxa(PAUSA.turno2[g]), 2), (taxa(PAUSA.turno2[g]) - taxa(PAUSA.turno1[g])).toLocaleString('pt-BR', { maximumFractionDigits: 2 }), num(PAUSA.turno2[g].secoes)]);
   } else if (qual === 'logs') {
-    cab = ['Depois das 17h', `Votos (${turnoPausa}º turno)`];
-    const f = PAUSA.logs.cidades[`faixas_${turnoPausa}t`];
-    linhas = f.map((v, k) => [k === f.length - 1 ? '19h20 ou mais' : `${17 + Math.floor(k / 6)}h${String((k % 6) * 10).padStart(2, '0')}`, num(v)]);
+    const t2 = turnoPausa === '2';
+    const f = t2 ? PAUSA.brasil_apos_17h.faixas : PAUSA.logs.cidades.faixas_1t;
+    const passo = t2 ? PAUSA.brasil_apos_17h.janela_min : 10;
+    cab = ['A partir de', t2 ? 'Votos no Brasil (2º turno)' : 'Votos nas 3 cidades (1º turno)'];
+    linhas = f.map((v, k) => [`${17 + Math.floor((k * passo) / 60)}h${String((k * passo) % 60).padStart(2, '0')}`, num(v)]);
   } else if (qual === 'cenarios') {
     cab = ['Cenário', `Vantagem de ${n[PAUSA.a]}`];
     linhas = PAUSA.cenarios.map(c => [ROTULO_CENARIO[c.id], sinal(c.margem)]);

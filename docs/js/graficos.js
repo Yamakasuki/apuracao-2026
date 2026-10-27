@@ -297,7 +297,7 @@ export function opcoesLogs(t, ctx) {
     grid: { left: 56, right: 16, top: 24, bottom: 32 },
     xAxis: {
       type: 'category', data: ctx.rotulos, axisTick: { show: false }, axisLine: { lineStyle: { color: t.eixo } },
-      axisLabel: { color: t.tinta3, interval: ctx.estreito ? 2 : 0 },
+      axisLabel: { color: t.tinta3, interval: ctx.valores.length > 16 ? (ctx.estreito ? 5 : 2) : (ctx.estreito ? 2 : 0) },
     },
     yAxis: eixoY(t, { axisLabel: { color: t.tinta3, formatter: v => (v >= 10000 ? compacto(v) : num(v)) } }),
     tooltip: {

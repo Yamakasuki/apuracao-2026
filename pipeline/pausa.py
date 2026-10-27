@@ -18,6 +18,7 @@ Uso: python pipeline/pausa.py
 """
 import csv
 import json
+import urllib.request
 
 import analisar
 import config
@@ -25,6 +26,34 @@ import config
 CIDADES = {"SALVADOR", "FEIRA DE SANTANA", "LAURO DE FREITAS"}
 UF = "BA"
 FIM_PAUSA = "2026-10-25T19:00:00"
+
+# Contagem de todas as urnas do país, com o horário de cada voto depois das 17h:
+# github.com/furtado0x/eleicoes-2026-votos-apos-17h (resultados/analise/urnas_com_votos_apos_17h.csv)
+URL_FURTADO = ("https://raw.githubusercontent.com/furtado0x/eleicoes-2026-votos-apos-17h/HEAD/"
+               "resultados/analise/urnas_com_votos_apos_17h.csv")
+JANELA = 5  # minutos por barra no gráfico do Brasil
+JANELAS = 27  # 17h00 até 19h10; a última junta o resto
+
+
+def faixas_brasil(linhas):
+    """Votos depois das 17h de Brasília, no Brasil e no exterior, e por janela de 5 min (só Brasil).
+
+    O horário de cada voto vem no relógio local da urna (HHMMSS); delta_h é o fuso em relação a Brasília.
+    """
+    faixas = [0] * JANELAS
+    brasil = exterior = 0
+    for l in linhas:
+        delta = float(l["delta_h"] or 0)
+        for h in filter(None, l["log_horarios_apos_corte"].split(";")):
+            s = int(h[:2]) * 3600 + int(h[2:4]) * 60 + int(h[4:6]) - delta * 3600 - 17 * 3600
+            if s <= 0:
+                continue
+            if l["uf"] == "zz":
+                exterior += 1
+            else:
+                brasil += 1
+                faixas[min(int(s // (JANELA * 60)), JANELAS - 1)] += 1
+    return {"brasil": brasil, "exterior": exterior, "janela_min": JANELA, "faixas": faixas}
 
 
 def grupos(urnas, cidades, uf, a, b):
@@ -139,6 +168,16 @@ def main():
               f"a mais: {f(c['a_mais'])}")
         e = logs["estimativa_resto_brasil"]
         print(f"Resto do Brasil (amostra): ~{f(e['depois_2t'])} votos depois do fechamento; a mais que no 1º turno: ~{f(e['a_mais'])}")
+
+    arq_furtado = config.BRUTOS / "2026" / "furtado" / "urnas_com_votos_apos_17h.csv"
+    if not arq_furtado.exists():
+        arq_furtado.parent.mkdir(parents=True, exist_ok=True)
+        with urllib.request.urlopen(URL_FURTADO, timeout=120) as r:
+            arq_furtado.write_bytes(r.read())
+    with open(arq_furtado, encoding="utf-8", newline="") as arq:
+        resultado["brasil_apos_17h"] = faixas_brasil(csv.DictReader(arq))
+    bra = resultado["brasil_apos_17h"]
+    print(f"Brasil inteiro (todas as urnas): {f(bra['brasil'])} votos depois das 17h; exterior {f(bra['exterior'])}")
 
     destino = config.SITE_DADOS / "2026-2t" / "pausa.json"
     destino.write_text(json.dumps(resultado, ensure_ascii=False, indent=1), encoding="utf-8")
