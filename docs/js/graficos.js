@@ -154,62 +154,6 @@ export function opcoesPercentual(t, d, ctx) {
   };
 }
 
-// ---------- 2. Vantagem em votos (acima de zero: o 1º principal na frente) ----------
-
-/** Linha do momento + linha de "resultado garantido" (2º turno). Usada também ao mover o momento. */
-export function marcasVantagem(t, d, ctx) {
-  const xs = ctx.eixo === 'tempo' ? d.xsTempo : d.xsUrnas;
-  const marcas = [{ xAxis: xs[ctx.i] }];
-  const def = d.L.eventos.definido;
-  if (def != null && ctx.turno === 2) {
-    marcas.push({
-      xAxis: xs[def], lineStyle: { color: t.eixo, width: 1, type: 'solid' },
-      label: { show: true, formatter: `Resultado garantido\n${hora(ctx.inicio, ctx.minutos[def])}`, color: t.tinta2, fontSize: 11, position: 'insideEndTop' },
-    });
-  }
-  return marcas;
-}
-
-export function opcoesVantagem(t, d, ctx) {
-  const xs = ctx.eixo === 'tempo' ? d.xsTempo : d.xsUrnas;
-  const { a, b } = d;
-  const picos = [];
-  for (const [lado, posicao] of [[a, 'top'], [b, 'bottom']]) {
-    const i = d.L.eventos.pico[lado];
-    if (i == null) continue;
-    const texto = `Maior vantagem de ${ctx.nomes[lado]}\n${compacto(Math.abs(d.v[i]))} · ${hora(ctx.inicio, ctx.minutos[i])}`;
-    picos.push(ponto(t, corDe(t, lado), [xs[i], d.v[i]], texto, posicao));
-  }
-  const marcas = marcasVantagem(t, d, ctx);
-  return {
-    ...base(t, ctx.animar),
-    grid: { left: 64, right: 24, top: 40, bottom: 32 },
-    xAxis: eixoX(t, ctx.eixo, ctx.zoom[0], ctx.zoom[1], ctx.estreito),
-    yAxis: eixoY(t, { axisLabel: { color: t.tinta3, formatter: v => compacto(v) } }),
-    tooltip: {
-      ...base(t).tooltip,
-      formatter: ps => {
-        const i = ps[0].dataIndex;
-        const lider = d.v[i] > 0 ? a : d.v[i] < 0 ? b : null;
-        const linhas = [{
-          cor: lider ? corDe(t, lider) : t.eixo, valor: lider ? `+${num(Math.abs(d.v[i]))}` : 'empate',
-          rotulo: lider ? `de vantagem para ${ctx.nomes[lider]}` : '',
-        }];
-        return caixaTooltip(tituloMomento(d, ctx, i), linhas);
-      },
-    },
-    // Duas séries: a parte acima de zero na cor de quem está na frente por cima, e a de baixo na do outro.
-    series: [[a, y => Math.max(y, 0)], [b, y => Math.min(y, 0)]].map(([lado, corte], k) => ({
-      id: k === 0 ? 'v' : 'v-b', name: ctx.nomes[lado], type: 'line', symbol: 'none', emphasis: { disabled: true },
-      lineStyle: { width: 2, color: corDe(t, lado), cap: 'round', join: 'round' },
-      areaStyle: { color: corDe(t, lado), opacity: 0.1 },
-      data: d.v.map((y, i) => [xs[i], corte(y)]),
-      markLine: k === 0 ? { ...linhaMomento(t, xs[ctx.i]), data: marcas } : undefined,
-      markPoint: k === 0 ? { silent: true, animation: false, data: picos } : undefined,
-    })),
-  };
-}
-
 // ---------- 3. Ritmo: votos que entraram a cada janela de 10 min ----------
 
 export function opcoesRitmo(t, d, ctx) {

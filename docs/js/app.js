@@ -224,17 +224,7 @@ const FURTADO = {
   url: 'https://github.com/furtado0x/eleicoes-2026-votos-apos-17h',
   brasil: 34050, exterior: 10865, sem_log: 4339, pior_caso: 49254,
   secoes_ate_19h: 6336, votos_secoes_ate_19h: 4475,
-  faixas: [['17:00–17:05', 28737], ['17:05–17:15', 1462], ['17:15–17:30', 633], ['17:30–18:00', 1225],
-    ['18:00–18:30', 1295], ['18:30–19:00', 687], ['depois das 19:00', 11]],
 };
-const COMPARACAO = [
-  ['Este projeto: 3 cidades da Bahia', 'logs de todas as 6.755 urnas', '1.994', 'mesmas urnas no furtado0x: 1.989'],
-  ['Este projeto: amostra do Brasil', 'logs de 5.000 urnas sorteadas', '282 (projeção: ~29,8 mil no Brasil)', 'mesmas urnas no furtado0x: 268'],
-  ['furtado0x (GitHub)', 'logs, BU e assinaturas de todas as 499.207 urnas', '34.050 no Brasil + 10.865 no exterior', 'pior caso: 49.254'],
-  ['g1 (via Gazeta do Povo)', 'logs de 497.897 urnas', '35.521', '30.866 validados + 4.655 pendentes'],
-  ['CNN Brasil / setup.news', 'dados do TSE', '34.330', '29.001 até 17h05; 5.329 depois'],
-  ['reset-hightide (GitHub)', 'não calcula: junta os números da CNN e do g1', '~35 mil', 'painel visual'],
-];
 let PAUSA = null; // docs/dados/2026-2t/pausa.json, carregado uma vez (o destaque não depende do turno escolhido lá em cima)
 let turnoPausa = '2';
 
@@ -302,9 +292,6 @@ function renderPausa() {
       `e o último às ${cid.ultimo_2t.slice(0, 5)}.`
     : `Na amostra aleatória de ${num(am.urnas)} urnas do resto do país, ${num(am.depois_1t)} votos foram dados depois do fechamento no 1º turno.`;
 
-  $('#comparacao').hidden = !t2;
-  if (t2) renderComparacao();
-
   const ap = P.antes_da_pausa;
   $('#pausa-t1').textContent = `Antes da pausa tinham chegado só ${num(ap.secoes)} de ${num(ap.total_secoes)} boletins ` +
     `(${pct((100 * ap.secoes) / ap.total_secoes, 1)}), a maioria do exterior. Os outros ${pct((100 * (ap.total_secoes - ap.secoes)) / ap.total_secoes, 1)} ` +
@@ -354,39 +341,11 @@ function renderPausa() {
   }), true);
 }
 
-function renderComparacao() {
-  const F = FURTADO;
-  const depois1705 = F.faixas.slice(1).reduce((a, [, v]) => a + v, 0);
-  $('#comp-texto').textContent = 'Outras pessoas fizeram a mesma conta. A mais completa é a do repositório furtado0x, que leu o log de todas as ' +
-    '499.207 urnas. Cruzei com as minhas urna por urna: das 11.755 urnas que eu li, 11.742 deram exatamente o mesmo número. As 13 diferenças vêm ' +
-    'de votos às 17:00:00 em ponto (eu conto, ele não) e do fuso do oeste do Amazonas (UTC−5), que eu tinha tratado como UTC−4. ' +
-    'Meu número para o Brasil era uma projeção da amostra (~29,8 mil); a contagem completa dá 34.050. A diferença é a margem de erro da amostra.';
-  const box = $('#comp-tabela');
-  box.replaceChildren(tabela(['Quem', 'Como contou', 'Votos depois das 17h (2º turno)', 'Observação'], COMPARACAO));
-  const a = document.createElement('a');
-  a.href = F.url;
-  a.rel = 'noopener';
-  a.textContent = 'Ver o repositório furtado0x';
-  box.append(a);
-  $('#comp-faixas-texto').textContent = `Os dois números estão certos; eles medem coisas diferentes. Dos ${num(F.brasil)} votos depois das 17h no Brasil, ` +
-    `${num(F.faixas[0][1])} (${pct((100 * F.faixas[0][1]) / F.brasil, 0)}) foram nos primeiros 5 minutos: o fim da fila de quem já estava no local às 17h, ` +
-    `que pode votar em qualquer eleição. Depois das 17h05 sobram ${num(depois1705)} votos: esse é o número de "quase 5 mil". Outro jeito de chegar perto ` +
-    `dele: ${num(F.secoes_ate_19h)} seções ficaram abertas até depois das 19h, e nelas entraram ${num(F.votos_secoes_ate_19h)} votos depois das 17h.`;
-  const t = G.tokens();
-  grafico('g-faixas').setOption(G.opcoesCenarios(t, {
-    rotulos: F.faixas.map(([r]) => r), valores: F.faixas.map(([, v]) => v), cor: t.tinta2,
-    animar: !semMovimento.matches, estreito: innerWidth < 600, nome: 'Votos', prefixo: '',
-  }), true);
-}
-
 function desenharGraficos() {
   const t = G.tokens();
   const ctx = contexto();
   grafico('g-percentual').setOption(G.opcoesPercentual(t, d, ctx), true);
-  grafico('g-vantagem').setOption(G.opcoesVantagem(t, d, ctx), true);
   grafico('g-ritmo').setOption(G.opcoesRitmo(t, d, ctx), true);
-  const [a, b] = [d.a, d.b];
-  $('#leg-vantagem').textContent = `Acima de zero, ${ctx.nomes[a]} na frente; abaixo, ${ctx.nomes[b]}.`;
   renderTabelas();
 }
 
@@ -396,7 +355,6 @@ function ligarZoom() {
     const x = xs();
     estado.periodo = [maisProximo(x, z.startValue), maisProximo(x, z.endValue)];
     const [i0, i1] = estado.periodo;
-    graficos['g-vantagem'].setOption({ xAxis: { min: x[i0], max: x[i1] } });
     graficos['g-ritmo'].setOption({ xAxis: { min: d.xsTempo[i0], max: d.xsTempo[i1] } });
     renderPeriodo();
   });
@@ -410,7 +368,6 @@ function atualizarMomento() {
   if (p) {
     const extra = D.resumo.turno === 2 ? [{ yAxis: 50, lineStyle: { color: t.eixo, width: 1, type: 'solid' } }] : [];
     p.setOption({ series: [{ id: `p-${d.candidatos[0]}`, markLine: { data: [{ xAxis: x[i] }, ...extra] } }] });
-    graficos['g-vantagem'].setOption({ series: [{ id: 'v', markLine: { data: G.marcasVantagem(t, d, contexto()) } }] });
     graficos['g-ritmo'].setOption({ series: [{ id: `r-${d.a}`, markLine: { data: [{ xAxis: d.xsTempo[i] }] } }] });
   }
   $('#momento-rotulo').textContent = `${hora(D.linha.inicio, D.linha.minutos[i])} · ${pct(d.xsUrnas[i], 1)}`;
