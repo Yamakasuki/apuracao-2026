@@ -314,12 +314,12 @@ export function opcoesLogs(t, ctx) {
 
 export function opcoesCenarios(t, ctx) {
   const o = barrasHorizontais(t, ctx, [{
-    name: 'Vantagem de Lula', type: 'bar', barMaxWidth: 20,
+    name: ctx.nome ?? 'Vantagem de Lula', type: 'bar', barMaxWidth: 20,
     itemStyle: { color: ctx.cor, borderRadius: [0, 4, 4, 0] },
-    label: { show: true, position: 'right', color: t.tinta, fontSize: 12, formatter: p => compacto(p.value) },
+    label: { show: true, position: 'right', color: t.tinta, fontSize: 12, formatter: p => (p.value < 10000 ? num(p.value) : compacto(p.value)) },
     data: ctx.valores,
   }], { min: 0, axisLabel: { color: t.tinta3, formatter: v => compacto(v) } });
-  o.tooltip.valueFormatter = v => `+${num(v)} votos`;
+  o.tooltip.valueFormatter = v => `${ctx.prefixo ?? '+'}${num(v)} votos`;
   return o;
 }
 

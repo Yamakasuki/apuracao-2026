@@ -122,6 +122,8 @@ figcaption strong { color: var(--tinta); }
 .fontes li { margin-bottom: 8px; }
 .fontes strong { color: var(--tinta); }
 .mais { margin-top: 16px; }
+.tabela-aberta { overflow-x: auto; margin: 8px 0; font-size: 0.9rem; }
+.tabela-aberta td, .tabela-aberta th { white-space: normal; text-align: left; vertical-align: top; }
 .mais > summary { cursor: pointer; font-weight: 600; }
 .veredito { font-size: 1.35rem; font-weight: 600; margin: 0 0 8px; }
 .testes { padding-left: 1.4em; margin: 16px 0 0; }
