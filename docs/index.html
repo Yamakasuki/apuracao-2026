@@ -38,6 +38,71 @@
   </div>
 
   <main>
+    <section class="cartao destaque-topo" id="pausa" aria-labelledby="pausa-titulo">
+      <p class="selo">Destaque · 2º turno, 25/10/2026</p>
+      <h2 id="pausa-titulo">A prorrogação da votação mudou o resultado?</h2>
+      <p class="veredito" id="pausa-veredito"></p>
+      <div class="kpis" id="pausa-kpis"></div>
+
+      <h3>Quantos votos foram dados depois das 17h</h3>
+      <p id="pausa-logs"></p>
+      <figure>
+        <figcaption><strong>Votos registrados depois das 17h</strong>, a cada 10 minutos, nas urnas de Salvador, Feira de Santana e Lauro de Freitas. Mesmas urnas nos dois turnos.</figcaption>
+        <ul class="legenda" id="legenda-logs"></ul>
+        <div class="grafico" id="g-logs"></div>
+        <details class="tabela" data-tabela="logs"><summary>Ver como tabela</summary><div></div></details>
+      </figure>
+      <p id="pausa-brasil"></p>
+
+      <h3>Quem pediu a prorrogação</h3>
+      <p>Os dois lados pediram, por motivos diferentes:</p>
+      <ul class="fontes">
+        <li><strong>Coligação de Lula</strong> (PT/PCdoB/PV): pediu ao TSE e depois ao STF votação até as 19h em Salvador, Feira de Santana e Lauro de Freitas (BA), alegando falta de ônibus; depois estendeu o pedido aos outros estados.
+          Fontes: <a href="https://www.metropoles.com/colunas/manoela-alcantara/pt-pede-ao-tse-para-prorrogar-votacao-ate-as-19h-em-cidades-da-bahia" rel="noopener">Metrópoles</a>,
+          <a href="https://exame.com/brasil/nunes-marques-determina-que-tre-ba-se-manifeste-sobre-pedido-de-prorrogacao-do-horario-das-eleicoes/" rel="noopener">Exame</a>,
+          <a href="https://www.poder360.com.br/integras/leia-a-integra-da-decisao-de-zanin-que-prorroga-votacao-ate-as-19h/" rel="noopener">Poder360 (íntegra da decisão)</a>.</li>
+        <li><strong>Campanha de Flávio Bolsonaro</strong> (PL): pediu ao TSE, por volta das 16h, prorrogação em cidades do Sul e do Sudeste por causa de chuvas, alagamentos e falta de energia (as fontes divergem entre 17 e 19 cidades e nos estados citados).
+          Fontes: <a href="https://www.poder360.com.br/poder-eleicoes-2026/zanin-prorroga-votacao-do-2o-turno-ate-19h/" rel="noopener">Poder360</a>,
+          <a href="https://aosfatos.org/noticias/relatos-supressao-voto-prorrogacao-segundo-turno" rel="noopener">Aos Fatos</a>,
+          <a href="https://www.metropoles.com/brasil/flavio-critica-decisao-de-zanin-mas-pl-tambem-pediu-prorrogacao-da-votacao" rel="noopener">Metrópoles</a>,
+          <a href="https://www.cnnbrasil.com.br/eleicoes/decisao-de-zanin-constrange-tse-e-ministros-descartam-3o-turno/" rel="noopener">CNN Brasil</a>.</li>
+        <li><strong>A decisão</strong>: o ministro Cristiano Zanin (STF), sozinho, prorrogou até as 19h; no mesmo dia esclareceu que valia só para as urnas que ainda não tinham sido fechadas. O TSE avisou as seções às 17h49 e suspendeu a totalização das 17h06 às 19h.
+          Fontes: <a href="https://www.migalhas.com.br/quentes/467196/zanin-aponta-que-prorrogacao-da-votacao-vale-para-urnas-ainda-abertas" rel="noopener">Migalhas</a>,
+          <a href="https://www.poder360.com.br/poder-eleicoes-2026/tse-avisou-secoes-sobre-prorrogacao-as-17h49/" rel="noopener">Poder360</a>,
+          <a href="https://agenciabrasil.ebc.com.br/politica/noticia/2026-10/tse-diz-que-contagem-dos-votos-sera-retomada-19h" rel="noopener">Agência Brasil</a>.</li>
+      </ul>
+
+      <details class="mais">
+        <summary>Outros testes com os dados (comparecimento e cenários)</summary>
+        <ol class="testes">
+          <li>
+            <h3>A pausa foi na contagem, não nos votos</h3>
+            <p id="pausa-t1"></p>
+          </li>
+          <li>
+            <h3>O comparecimento subiu mais onde a prorrogação foi pedida?</h3>
+            <p id="pausa-t2"></p>
+            <figure>
+              <figcaption><strong>Comparecimento (% dos aptos)</strong> no 1º e no 2º turno.</figcaption>
+              <ul class="legenda" id="legenda-comp"></ul>
+              <div class="grafico grafico--baixo" id="g-comparecimento"></div>
+              <details class="tabela" data-tabela="comparecimento"><summary>Ver como tabela</summary><div></div></details>
+            </figure>
+          </li>
+          <li>
+            <h3>E se esses votos não valessem?</h3>
+            <p id="pausa-t3"></p>
+            <figure>
+              <figcaption><strong>Vantagem de Lula em cada cenário</strong>, em votos. Em todos ele continua na frente.</figcaption>
+              <div class="grafico grafico--baixo" id="g-cenarios"></div>
+              <details class="tabela" data-tabela="cenarios"><summary>Ver como tabela</summary><div></div></details>
+            </figure>
+          </li>
+        </ol>
+      </details>
+      <p class="nota" id="pausa-limite"></p>
+    </section>
+
     <section class="cartao heroi" id="resultado" aria-live="polite"></section>
 
     <section class="cartao">
@@ -56,38 +121,6 @@
       <p class="periodo" id="periodo"></p>
       <h3>Destaques</h3>
       <div class="destaques" id="destaques"></div>
-    </section>
-
-    <section class="cartao pausa" id="pausa" hidden>
-      <h2>A pausa mudou o resultado?</h2>
-      <p class="veredito" id="pausa-veredito"></p>
-      <p id="pausa-contexto"></p>
-      <ol class="testes">
-        <li>
-          <h3>A pausa foi na contagem, não nos votos</h3>
-          <p id="pausa-t1"></p>
-        </li>
-        <li>
-          <h3>Quantos eleitores a mais apareceram onde a prorrogação foi pedida</h3>
-          <p id="pausa-t2"></p>
-          <figure>
-            <figcaption><strong>Comparecimento (% dos aptos)</strong> no 1º e no 2º turno.</figcaption>
-            <ul class="legenda" id="legenda-comp"></ul>
-            <div class="grafico grafico--baixo" id="g-comparecimento"></div>
-            <details class="tabela" data-tabela="comparecimento"><summary>Ver como tabela</summary><div></div></details>
-          </figure>
-        </li>
-        <li>
-          <h3>E se esses votos não valessem?</h3>
-          <p id="pausa-t3"></p>
-          <figure>
-            <figcaption><strong>Vantagem de Lula em cada cenário</strong>, em votos. Em todos ele continua na frente.</figcaption>
-            <div class="grafico grafico--baixo" id="g-cenarios"></div>
-            <details class="tabela" data-tabela="cenarios"><summary>Ver como tabela</summary><div></div></details>
-          </figure>
-        </li>
-      </ol>
-      <p class="nota" id="pausa-limite"></p>
     </section>
 
     <section class="cartao">

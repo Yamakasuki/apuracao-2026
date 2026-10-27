@@ -39,5 +39,19 @@ class TestPausa(unittest.TestCase):
         self.assertEqual(r, {"secoes": 1, "votos": 5, "total_secoes": 2, "total_votos": 13})
 
 
+class TestResumoLogs(unittest.TestCase):
+    def test_compara_so_urnas_com_os_dois_turnos(self):
+        def linha(grupo, v1, d1, v2, d2, f1="0 0 0 0 0 0 0", f2="0 0 0 0 0 0 0"):
+            return {"grupo": grupo, "votos_1t": str(v1), "depois_1t": str(d1), "votos_2t": str(v2), "depois_2t": str(d2),
+                    "ultimo_2t": "18:10:00", "faixas_1t": f1, "faixas_2t": f2}
+        linhas = [linha("cidades", 300, 5, 310, 40, "5 0 0 0 0 0 0", "10 10 10 0 0 0 10"),
+                  linha("cidades", 0, 0, 200, 30)]  # urna trocada: não entra na comparação
+        g = pausa.resumo_logs(linhas)["cidades"]
+        self.assertEqual((g["urnas"], g["urnas_comparaveis"]), (2, 1))
+        self.assertEqual((g["depois_2t"], g["depois_1t"], g["a_mais"]), (70, 5, 35))
+        self.assertEqual(g["faixas_2t"], [10, 10, 10, 0, 0, 0, 10])
+        self.assertEqual((g["urnas_depois_18h_2t"], g["urnas_depois_18h_1t"]), (1, 0))
+
+
 if __name__ == "__main__":
     unittest.main()

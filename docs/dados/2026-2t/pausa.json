@@ -87,5 +87,108 @@
    "id": "sem_uf",
    "margem": 553694
   }
- ]
+ ],
+ "logs": {
+  "cidades": {
+   "urnas": 6755,
+   "urnas_comparaveis": 6665,
+   "votos_2t": 2156868,
+   "depois_2t": 1994,
+   "votos_1t": 2019655,
+   "depois_1t": 118104,
+   "depois_2t_comparaveis": 1959,
+   "votos_2t_comparaveis": 2133642,
+   "urnas_depois_18h_2t": 221,
+   "urnas_depois_18h_1t": 1168,
+   "ultimo_2t": "19:01:48",
+   "faixas_1t": [
+    26183,
+    21195,
+    17578,
+    14139,
+    11093,
+    8469,
+    6264,
+    4414,
+    3063,
+    2065,
+    1341,
+    811,
+    509,
+    355,
+    625
+   ],
+   "faixas_2t": [
+    1474,
+    39,
+    40,
+    38,
+    62,
+    49,
+    57,
+    53,
+    55,
+    45,
+    27,
+    18,
+    2,
+    0,
+    0
+   ],
+   "a_mais": -116145
+  },
+  "amostra_brasil": {
+   "urnas": 5000,
+   "urnas_comparaveis": 4955,
+   "votos_2t": 1278401,
+   "depois_2t": 282,
+   "votos_1t": 1237228,
+   "depois_1t": 35678,
+   "depois_2t_comparaveis": 280,
+   "votos_2t_comparaveis": 1267469,
+   "urnas_depois_18h_2t": 14,
+   "urnas_depois_18h_1t": 360,
+   "ultimo_2t": "18:57:38",
+   "faixas_1t": [
+    8560,
+    6019,
+    4772,
+    3842,
+    3030,
+    2401,
+    1765,
+    1326,
+    1048,
+    777,
+    602,
+    434,
+    301,
+    236,
+    565
+   ],
+   "faixas_2t": [
+    229,
+    12,
+    5,
+    5,
+    5,
+    6,
+    3,
+    3,
+    5,
+    4,
+    1,
+    2,
+    0,
+    0,
+    0
+   ],
+   "a_mais": -35398
+  },
+  "estimativa_resto_brasil": {
+   "votos": 126074271,
+   "depois_2t": 27851,
+   "a_mais": -3607758
+  }
+ }
 }

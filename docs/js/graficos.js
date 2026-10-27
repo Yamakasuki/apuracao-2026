@@ -290,6 +290,28 @@ export function opcoesComparecimento(t, ctx) {
   return o;
 }
 
+/** Votos registrados nos logs depois das 17h, a cada 10 min: 1º turno × 2º turno (mesmas urnas). */
+export function opcoesLogs(t, ctx) {
+  const serie = (nome, valores, cor) => ({
+    name: nome, type: 'bar', barMaxWidth: 12, barGap: '20%',
+    itemStyle: { color: cor, borderRadius: [4, 4, 0, 0] }, data: valores,
+  });
+  return {
+    ...base(t, ctx.animar),
+    grid: { left: 56, right: 16, top: 16, bottom: 32 },
+    xAxis: {
+      type: 'category', data: ctx.rotulos, axisTick: { show: false }, axisLine: { lineStyle: { color: t.eixo } },
+      axisLabel: { color: t.tinta3, interval: ctx.estreito ? 2 : 0 },
+    },
+    yAxis: eixoY(t, { axisLabel: { color: t.tinta3, formatter: v => compacto(v) } }),
+    tooltip: {
+      ...base(t).tooltip, axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(137,135,129,0.12)' } },
+      valueFormatter: v => `${num(v)} votos`,
+    },
+    series: [serie('1º turno', ctx.t1, t.eixo), serie('2º turno', ctx.t2, t.tinta)],
+  };
+}
+
 export function opcoesCenarios(t, ctx) {
   const o = barrasHorizontais(t, ctx, [{
     name: 'Vantagem de Lula', type: 'bar', barMaxWidth: 20,

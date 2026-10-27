@@ -107,6 +107,17 @@ figcaption strong { color: var(--tinta); }
 .destaque button { align-self: flex-start; margin-top: auto; }
 
 .grafico--baixo { height: 260px; }
+.destaque-topo { border: 2px solid var(--tinta); }
+.destaque-topo .selo { display: inline-block; margin: 0 0 8px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em;
+  color: var(--superficie); background: var(--tinta); border-radius: 4px; padding: 2px 8px; }
+.destaque-topo h2 { font-size: 1.5rem; }
+.destaque-topo > p { color: var(--tinta-2); }
+.kpi__detalhe { font-size: 0.8rem; color: var(--tinta-3); }
+.fontes { padding-left: 1.2em; color: var(--tinta-2); }
+.fontes li { margin-bottom: 8px; }
+.fontes strong { color: var(--tinta); }
+.mais { margin-top: 16px; }
+.mais > summary { cursor: pointer; font-weight: 600; }
 .veredito { font-size: 1.35rem; font-weight: 600; margin: 0 0 8px; }
 .testes { padding-left: 1.4em; margin: 16px 0 0; }
 .testes > li { margin-bottom: 20px; }

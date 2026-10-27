@@ -132,3 +132,20 @@ e o resultado ficou garantido às 21:08 (anunciado entre 21h08 e 21h10).
 
 Cores: vermelho para Lula e azul para Flávio Bolsonaro, passando no teste de daltonismo nos temas claro e escuro. A cor segue
 o candidato, não a posição, então não troca quando o 1º turno inverte a ordem.
+
+## 8. A prorrogação de 25/10 mudou o resultado?
+
+O argumento de quem perdeu foi que os votos dados durante a prorrogação (até 19h) decidiram a eleição.
+Para medir, usei o **log de cada urna** (arquivo `.jez` em `resultados.tse.jus.br/oficial/ele2026/arquivo-urna/3221/...`),
+que registra o horário de cada voto. Como a urna é a mesma nos dois turnos, o mesmo log traz o 1º turno,
+que serve de comparação (`pipeline/logs_urna.py` e `pipeline/pausa.py`).
+
+- Nas 6.755 urnas de Salvador, Feira de Santana e Lauro de Freitas: **1.994 votos depois das 17h** no 2º turno
+  (485 depois das 17h10; último às 19:01). Nas mesmas urnas, no 1º turno, foram 118.104.
+- No país todo, o g1 contou 35.521 votos depois das 17h (CNN: 34.330); a amostra de 5 mil urnas projeta uns 28 mil fora das três cidades.
+- 35.521 votos são 0,80% da vantagem de Lula (4.430.191). Mesmo se todos virassem votos do Flávio, Lula venceria por 4.359.149.
+- Os dois lados pediram prorrogação: a coligação de Lula (falta de ônibus na Bahia) e a campanha de Flávio Bolsonaro (chuvas no Sul e no Sudeste).
+  As fontes estão no topo do site.
+
+Para refazer: `python pipeline/logs_urna.py` (baixa ~1,6 GB de logs, uns 15 minutos) e `python pipeline/pausa.py`.
+O `.jez` é um 7z; o `tar` do Windows 10/11 abre (`tar -xOf arquivo.jez`).
