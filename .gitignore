@@ -1,5 +1,5 @@
 # Dados brutos e intermediários (vários GB) ficam só na máquina
-dados/
+/dados/
 
 # Python
 __pycache__/
