@@ -445,15 +445,42 @@ function renderPlacar() {
   bloco('Vantagem', v === 0 ? 'empate' : `${n[v > 0 ? d.a : d.b]} +${num(Math.abs(v))}`, v ? G.corDe(t, v > 0 ? d.a : d.b) : null);
 }
 
+/** Os 4 eventos mais relevantes do local: viradas, resultado garantido, picos (menos o placar final) e arrancadas. */
 function renderDestaques() {
   const n = nomes();
   const t = G.tokens();
   const ev = d.L.eventos;
+  const ultimo = d.v.length - 1;
+  const m = i => `${hora(D.linha.inicio, D.linha.minutos[i])}, com ${pct(d.xsUrnas[i])} das urnas`;
+  const cards = [];
+  if (ev.viradas.length) {
+    for (const v of ev.viradas) cards.push(['Virada', G.corDe(t, v.lider), `${n[v.lider]} passou à frente às ${m(v.i)}.`, v.i]);
+  } else {
+    const lider = d.v[ultimo] >= 0 ? d.a : d.b;
+    cards.push(['Virada', G.corDe(t, lider), `Não houve: ${n[lider]} liderou do começo ao fim.`, null]);
+  }
+  if (ev.definido != null && D.resumo.turno === 2) {
+    cards.push(['Resultado garantido', null, `Às ${m(ev.definido)}: a vantagem passou do total de eleitores das urnas que ainda faltavam.`, ev.definido]);
+  }
+  for (const lado of [d.a, d.b]) {
+    const i = ev.pico[lado];
+    // o pico no último minuto é só o resultado final, que já aparece no topo
+    if (i != null && i !== ultimo) cards.push([`Maior vantagem de ${n[lado]}`, G.corDe(t, lado), `${num(Math.abs(d.v[i]))} votos às ${m(i)}.`, i]);
+  }
+  for (const lado of [d.a, d.b]) {
+    const arr = ev.arrancada[lado];
+    if (!arr) continue;
+    const de = instante(D.linha.inicio, arr.janela * D.linha.largura_ritmo);
+    const ate = de + D.linha.largura_ritmo * 60000;
+    const ufs = arr.ufs?.length ? `, puxada por ${arr.ufs.map(([uf]) => uf).join(', ')}` : '';
+    cards.push([`Maior arrancada de ${n[lado]}`, G.corDe(t, lado), `+${num(arr.liquido)} votos de vantagem entre ${horaDe(de)} e ${horaDe(ate)}${ufs}.`,
+      indiceAte(D.linha.minutos, (arr.janela + 1) * D.linha.largura_ritmo - 1)]);
+  }
+
   const box = $('#destaques');
   box.replaceChildren();
   document.querySelector('.contexto')?.remove();
-  const m = i => `${hora(D.linha.inicio, D.linha.minutos[i])}, com ${pct(d.xsUrnas[i])} das urnas`;
-  const card = (titulo, cor, texto, i) => {
+  for (const [titulo, cor, texto, i] of cards.slice(0, 4)) {
     const c = el('div', 'destaque');
     const h = el('div', 'destaque__titulo');
     if (cor) h.append(chave(cor));
@@ -466,50 +493,8 @@ function renderDestaques() {
       c.append(btn);
     }
     box.append(c);
-  };
-  if (ev.viradas.length) {
-    for (const v of ev.viradas) card('Virada', G.corDe(t, v.lider), `${n[v.lider]} passou à frente às ${m(v.i)}.`, v.i);
-  } else {
-    const lider = d.v[d.v.length - 1] >= 0 ? d.a : d.b;
-    card('Virada', G.corDe(t, lider), `Não houve: ${n[lider]} liderou do começo ao fim.`, null);
-  }
-  for (const lado of [d.a, d.b]) {
-    const i = ev.pico[lado];
-    if (i != null) card(`Maior vantagem de ${n[lado]}`, G.corDe(t, lado), `${num(Math.abs(d.v[i]))} votos às ${m(i)}.`, i);
-  }
-  if (ev.definido != null && D.resumo.turno === 2) {
-    card('Resultado garantido', null, `Às ${m(ev.definido)}: a vantagem passou do total de eleitores das urnas que ainda faltavam.`, ev.definido);
-  }
-  const pausa = maiorPausa();
-  if (pausa && pausa.fim - pausa.inicio >= 20) {
-    card('Maior pausa', null, `Entre ${hora(D.linha.inicio, pausa.inicio)} e ${hora(D.linha.inicio, pausa.fim)} ` +
-      `não chegou nenhum boletim${estado.local === 'BR' ? '' : ' deste local'} (${pausa.fim - pausa.inicio} minutos).`, pausa.i);
   }
   if (CONTEXTO[estado.id]) box.after(el('p', 'nota contexto', CONTEXTO[estado.id]));
-  for (const lado of [d.a, d.b]) {
-    const arr = ev.arrancada[lado];
-    if (!arr) continue;
-    const de = instante(D.linha.inicio, arr.janela * D.linha.largura_ritmo);
-    const ate = de + D.linha.largura_ritmo * 60000;
-    const ufs = arr.ufs?.length ? `, puxada por ${arr.ufs.map(([uf]) => uf).join(', ')}` : '';
-    card(`Maior arrancada de ${n[lado]}`, G.corDe(t, lado),
-      `+${num(arr.liquido)} votos de vantagem entre ${horaDe(de)} e ${horaDe(ate)}${ufs}.`,
-      indiceAte(D.linha.minutos, (arr.janela + 1) * D.linha.largura_ritmo - 1));
-  }
-}
-
-/** Maior intervalo sem urna nova no local, antes de 99,9% das urnas (a cauda da madrugada não conta). */
-function maiorPausa() {
-  const m = D.linha.minutos;
-  const s = d.L.secoes;
-  let melhor = null;
-  let anterior = 0;
-  for (let i = 1; i < m.length && m[i] <= D.linha.minuto_99; i++) {
-    if (s[i] === s[i - 1]) continue;
-    if (!melhor || m[i] - m[anterior] > melhor.fim - melhor.inicio) melhor = { inicio: m[anterior], fim: m[i], i };
-    anterior = i;
-  }
-  return melhor;
 }
 
 function renderPeriodo() {
