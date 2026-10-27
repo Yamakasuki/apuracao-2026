@@ -39,16 +39,19 @@
 
   <main>
     <section class="cartao destaque-topo" id="pausa" aria-labelledby="pausa-titulo">
-      <p class="selo">Destaque · 2º turno, 25/10/2026</p>
+      <p class="selo">Destaque · a prorrogação de 25/10/2026</p>
       <h2 id="pausa-titulo">A prorrogação da votação mudou o resultado?</h2>
+      <div class="seletor" role="radiogroup" aria-label="Turno dos números do destaque">
+        <label><input type="radio" name="turno-pausa" value="2" checked> 2º turno</label>
+        <label><input type="radio" name="turno-pausa" value="1"> 1º turno</label>
+      </div>
       <p class="veredito" id="pausa-veredito"></p>
       <div class="kpis" id="pausa-kpis"></div>
 
       <h3>Quantos votos foram dados depois das 17h</h3>
       <p id="pausa-logs"></p>
       <figure>
-        <figcaption><strong>Votos registrados depois das 17h</strong>, a cada 10 minutos, nas urnas de Salvador, Feira de Santana e Lauro de Freitas. Mesmas urnas nos dois turnos.</figcaption>
-        <ul class="legenda" id="legenda-logs"></ul>
+        <figcaption><strong>Votos registrados depois das 17h</strong>, a cada 10 minutos, nas urnas de Salvador, Feira de Santana e Lauro de Freitas (<span id="pausa-turno-rotulo"></span>).</figcaption>
         <div class="grafico" id="g-logs"></div>
         <details class="tabela" data-tabela="logs"><summary>Ver como tabela</summary><div></div></details>
       </figure>

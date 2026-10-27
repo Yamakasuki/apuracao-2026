@@ -290,25 +290,25 @@ export function opcoesComparecimento(t, ctx) {
   return o;
 }
 
-/** Votos registrados nos logs depois das 17h, a cada 10 min: 1º turno × 2º turno (mesmas urnas). */
+/** Votos registrados nos logs depois das 17h, a cada 10 min, no turno escolhido. */
 export function opcoesLogs(t, ctx) {
-  const serie = (nome, valores, cor) => ({
-    name: nome, type: 'bar', barMaxWidth: 12, barGap: '20%',
-    itemStyle: { color: cor, borderRadius: [4, 4, 0, 0] }, data: valores,
-  });
   return {
     ...base(t, ctx.animar),
-    grid: { left: 56, right: 16, top: 16, bottom: 32 },
+    grid: { left: 56, right: 16, top: 24, bottom: 32 },
     xAxis: {
       type: 'category', data: ctx.rotulos, axisTick: { show: false }, axisLine: { lineStyle: { color: t.eixo } },
       axisLabel: { color: t.tinta3, interval: ctx.estreito ? 2 : 0 },
     },
-    yAxis: eixoY(t, { axisLabel: { color: t.tinta3, formatter: v => compacto(v) } }),
+    yAxis: eixoY(t, { axisLabel: { color: t.tinta3, formatter: v => (v >= 10000 ? compacto(v) : num(v)) } }),
     tooltip: {
       ...base(t).tooltip, axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(137,135,129,0.12)' } },
       valueFormatter: v => `${num(v)} votos`,
     },
-    series: [serie('1º turno', ctx.t1, t.eixo), serie('2º turno', ctx.t2, t.tinta)],
+    series: [{
+      name: ctx.nome, type: 'bar', barMaxWidth: 24, itemStyle: { color: t.tinta2, borderRadius: [4, 4, 0, 0] },
+      label: { show: true, position: 'top', color: t.tinta, fontSize: 11, formatter: p => (p.value ? num(p.value) : '') },
+      data: ctx.valores,
+    }],
   };
 }
 

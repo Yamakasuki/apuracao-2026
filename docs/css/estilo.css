@@ -112,6 +112,11 @@ figcaption strong { color: var(--tinta); }
   color: var(--superficie); background: var(--tinta); border-radius: 4px; padding: 2px 8px; }
 .destaque-topo h2 { font-size: 1.5rem; }
 .destaque-topo > p { color: var(--tinta-2); }
+.seletor { display: inline-flex; border: 1px solid var(--borda); border-radius: 8px; overflow: hidden; margin: 4px 0 12px; }
+.seletor label { padding: 6px 14px; cursor: pointer; color: var(--tinta-2); }
+.seletor input { position: absolute; opacity: 0; }
+.seletor label:has(input:checked) { background: var(--tinta); color: var(--superficie); font-weight: 600; }
+.seletor label:has(input:focus-visible) { outline: 2px solid var(--foco); outline-offset: -2px; }
 .kpi__detalhe { font-size: 0.8rem; color: var(--tinta-3); }
 .fontes { padding-left: 1.2em; color: var(--tinta-2); }
 .fontes li { margin-bottom: 8px; }
