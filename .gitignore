@@ -1,0 +1,7 @@
+# Dados brutos e intermediários (vários GB) ficam só na máquina
+dados/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
