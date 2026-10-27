@@ -17,11 +17,13 @@ COLUNAS = ["uf", "cd_municipio", "municipio", "zona", "secao", "recebido",
 
 
 def horario(texto):
-    """'25/10/2026 17:05:10' -> '2026-10-25T17:05:10'; vazio ou #NULO# -> None."""
-    try:
-        return datetime.strptime(texto, config.FORMATO_DATA_HORA).isoformat()
-    except ValueError:
-        return None
+    """'2026-10-25 17:05:10' (2026) ou '25/10/2022 17:05:10' (2022) -> ISO; vazio ou #NULO# -> None."""
+    for formato in config.FORMATOS_DATA_HORA:
+        try:
+            return datetime.strptime(texto, formato).isoformat()
+        except ValueError:
+            pass
+    return None
 
 
 def votavel(nr):

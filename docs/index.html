@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apuração 2026 · Presidente</title>
+  <meta name="description" content="A apuração da eleição para Presidente em 2026, minuto a minuto, refeita com os boletins de urna do TSE.">
+  <link rel="stylesheet" href="css/estilo.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js" defer></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="topo">
+    <div>
+      <h1>Apuração 2026 · Presidente</h1>
+      <p class="sub">A contagem dos votos minuto a minuto, refeita com os boletins de urna do TSE.</p>
+    </div>
+    <button id="tema" class="botao botao--leve" type="button" aria-label="Alternar tema claro ou escuro">Tema</button>
+  </header>
+
+  <div class="barra" role="region" aria-label="Filtros e reprodução">
+    <div class="barra__linha">
+      <label>Turno <select id="f-turno"></select></label>
+      <label>Local <select id="f-local"></select></label>
+      <span class="grupo" role="radiogroup" aria-label="Eixo horizontal">
+        <label><input type="radio" name="eixo" value="tempo" checked> Horário</label>
+        <label><input type="radio" name="eixo" value="urnas"> % das urnas</label>
+      </span>
+    </div>
+    <div class="barra__linha player">
+      <button id="play" class="botao" type="button">▶ Reproduzir</button>
+      <input id="momento" type="range" min="0" max="0" value="0" aria-label="Momento da apuração">
+      <output id="momento-rotulo" for="momento">–</output>
+      <label class="velocidade">Velocidade
+        <select id="velocidade"><option value="1">1×</option><option value="2" selected>2×</option><option value="5">5×</option></select>
+      </label>
+    </div>
+  </div>
+
+  <main>
+    <section class="cartao heroi" id="resultado" aria-live="polite"></section>
+
+    <section class="cartao">
+      <h2>A apuração, do começo ao fim</h2>
+      <div class="placar" id="placar"></div>
+      <figure>
+        <figcaption><strong>% dos votos válidos</strong> conforme as urnas iam chegando. Arraste a barra de baixo para escolher um período.</figcaption>
+        <ul class="legenda" id="legenda-p"></ul>
+        <div class="grafico grafico--alto" id="g-percentual"></div>
+        <details class="tabela" data-tabela="percentual"><summary>Ver como tabela</summary><div></div></details>
+      </figure>
+      <figure>
+        <figcaption><strong>Vantagem em votos.</strong> <span id="leg-vantagem"></span></figcaption>
+        <div class="grafico" id="g-vantagem"></div>
+      </figure>
+      <p class="periodo" id="periodo"></p>
+      <h3>Destaques</h3>
+      <div class="destaques" id="destaques"></div>
+    </section>
+
+    <section class="cartao">
+      <h2>Quando os votos entraram</h2>
+      <figure>
+        <figcaption><strong>Votos recebidos a cada 10 minutos.</strong> A faixa marca a janela em que cada um mais ganhou vantagem.</figcaption>
+        <ul class="legenda" id="legenda-r"></ul>
+        <div class="grafico" id="g-ritmo"></div>
+        <details class="tabela" data-tabela="ritmo"><summary>Ver como tabela</summary><div></div></details>
+      </figure>
+    </section>
+
+    <section class="cartao">
+      <h2>De onde vieram os votos</h2>
+      <figure>
+        <figcaption><strong>Diferença entre os dois por estado</strong>, em pontos percentuais dos válidos, no momento escolhido. Clique num estado para filtrar.</figcaption>
+        <div class="grafico grafico--mapa" id="g-mapa"></div>
+        <details class="tabela" data-tabela="ufs"><summary>Ver como tabela (inclui o exterior)</summary><div></div></details>
+      </figure>
+    </section>
+
+    <section class="cartao">
+      <h2>Onde cada um foi mais forte</h2>
+      <div class="barra__linha">
+        <label>Ordenar por
+          <select id="ordem"><option value="votos">votos de vantagem</option><option value="pontos">% de vantagem</option></select>
+        </label>
+        <label class="busca">Procurar cidade <input id="busca" type="search" placeholder="ex.: Campinas"></label>
+      </div>
+      <div id="busca-resultado"></div>
+      <div class="rankings" id="rankings"></div>
+    </section>
+
+    <section class="cartao como" id="como">
+      <h2>Como foi feito</h2>
+      <ol class="passos">
+        <li><strong>Baixar.</strong> Dois arquivos do <a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026" rel="noopener">Portal de Dados Abertos do TSE</a> (Resultados 2026): <code>votacao_secao_2026_BR</code>, com os votos de cada candidato em cada seção, e <code>detalhe_votacao_secao_2026</code>, com aptos, comparecimento e horário de cada seção. CSV com separador <code>;</code> e codificação latin-1.</li>
+        <li><strong>Juntar.</strong> O script lê os zips em streaming, sem descompactar no disco, e junta os dois arquivos pela chave estado + município + zona + seção. Sai uma linha por urna.</li>
+        <li><strong>Ordenar no tempo.</strong> Cada seção tem o horário em que o boletim de urna chegou ao TSE (<code>DT_RECEBIMENTO_BU_HOR_TSE</code>, horário de Brasília). Ordenando as urnas por esse horário e somando os votos, dá para refazer a apuração minuto a minuto.</li>
+        <li><strong>Analisar.</strong> Com os acumulados saem a virada, o maior pico de vantagem de cada lado, a janela de 10 minutos com maior arrancada e o momento em que a vantagem passou dos eleitores das urnas que faltavam.</li>
+        <li><strong>Mostrar.</strong> O resultado vira JSON pequeno que esta página lê. O código e o passo a passo estão no repositório.</li>
+      </ol>
+      <p class="nota" id="nota-dados"></p>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    Dados: Tribunal Superior Eleitoral (boletins de urna). Mapa: IBGE. Horários de Brasília.
+  </footer>
+</body>
+</html>

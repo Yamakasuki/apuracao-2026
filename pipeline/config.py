@@ -20,9 +20,13 @@ DATASET_BU = "resultados-{ano}-boletim-de-urna"
 # Boletim de urna (bweb)
 CARGO_PRESIDENTE = "1"
 ATALHO_PRESIDENTE = b'"Presidente"'  # só linhas com esse texto são decodificadas (bem mais rápido)
+# Candidatos cujos votos o TSE contou como "nulo técnico" (não entram nos válidos).
+# 2026, 1º turno: o nº 28 (PRTB) aparece nos dados por seção, mas o resultado oficial soma os votos dele aos nulos.
+NULOS_TECNICOS = {(2026, 1): {"28"}}
 BRANCO = "95"
 NULO = "96"
-FORMATO_DATA_HORA = "%d/%m/%Y %H:%M:%S"
+# DT_BU_RECEBIDO está no horário de Brasília (conferido: em RR chega >= 65 min depois da emissão local).
+FORMATOS_DATA_HORA = ("%Y-%m-%d %H:%M:%S", "%d/%m/%Y %H:%M:%S")
 
 # A divulgação começa às 17h de Brasília, quando fecham as últimas urnas do país.
 INICIO_DIVULGACAO = "17:00"

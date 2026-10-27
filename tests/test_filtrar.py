@@ -38,7 +38,7 @@ def criar_zip(pasta, linhas):
 SP = ("SP", "71072", "SÃO PAULO", "1", "10")
 RR = ("RR", "03018", "BOA VISTA", "1", "5")
 LINHAS = [
-    linha(*SP, "1", "Presidente", "25/10/2026 17:05:10", 300, 250, "1", "13", "LULA", 100, "PT"),
+    linha(*SP, "1", "Presidente", "2026-10-25 17:05:10", 300, 250, "1", "13", "LULA", 100, "PT"),
     linha(*SP, "1", "Presidente", "25/10/2026 17:05:10", 300, 250, "1", "22", "FLÁVIO BOLSONARO", 120, "PL"),
     linha(*SP, "1", "Presidente", "25/10/2026 17:05:10", 300, 250, "2", "95", "Branco", 10),
     linha(*SP, "1", "Presidente", "25/10/2026 17:05:10", 300, 250, "3", "96", "Nulo", 20),
