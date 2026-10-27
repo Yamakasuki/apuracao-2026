@@ -259,6 +259,48 @@ export function opcoesRitmo(t, d, ctx) {
   };
 }
 
+// ---------- Pausa: comparecimento 1º × 2º turno e cenários ----------
+
+function barrasHorizontais(t, ctx, series, eixoValor) {
+  return {
+    ...base(t, ctx.animar),
+    grid: { left: ctx.estreito ? 8 : 300, right: 72, top: 8, bottom: 24, containLabel: ctx.estreito },
+    xAxis: eixoY(t, eixoValor),
+    yAxis: {
+      type: 'category', inverse: true, data: ctx.rotulos, axisTick: { show: false },
+      axisLine: { lineStyle: { color: t.eixo } },
+      axisLabel: { color: t.tinta2, width: ctx.estreito ? 140 : 290, overflow: 'break', lineHeight: 15 },
+    },
+    tooltip: { ...base(t).tooltip, trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(137,135,129,0.12)' } } },
+    series,
+  };
+}
+
+export function opcoesComparecimento(t, ctx) {
+  const serie = (nome, valores, cor) => ({
+    name: nome, type: 'bar', barMaxWidth: 12, barGap: '30%',
+    itemStyle: { color: cor, borderRadius: [0, 4, 4, 0] },
+    label: { show: true, position: 'right', color: t.tinta, fontSize: 12, formatter: p => pct(p.value, 1) },
+    data: valores,
+  });
+  const min = Math.floor(Math.min(...ctx.t1, ...ctx.t2) / 5) * 5;
+  const o = barrasHorizontais(t, ctx, [serie('1º turno', ctx.t1, t.eixo), serie('2º turno', ctx.t2, t.tinta2)],
+    { min, max: 90, axisLabel: { color: t.tinta3, formatter: v => `${v}%` } });
+  o.tooltip.valueFormatter = v => pct(v, 2);
+  return o;
+}
+
+export function opcoesCenarios(t, ctx) {
+  const o = barrasHorizontais(t, ctx, [{
+    name: 'Vantagem de Lula', type: 'bar', barMaxWidth: 20,
+    itemStyle: { color: ctx.cor, borderRadius: [0, 4, 4, 0] },
+    label: { show: true, position: 'right', color: t.tinta, fontSize: 12, formatter: p => compacto(p.value) },
+    data: ctx.valores,
+  }], { min: 0, axisLabel: { color: t.tinta3, formatter: v => compacto(v) } });
+  o.tooltip.valueFormatter = v => `+${num(v)} votos`;
+  return o;
+}
+
 // ---------- 4. Mapa por UF: diferença em pontos percentuais dos válidos no momento ----------
 
 export function opcoesMapa(t, ctx) {

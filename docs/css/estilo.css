@@ -106,6 +106,14 @@ figcaption strong { color: var(--tinta); }
 .destaque p { margin: 0; }
 .destaque button { align-self: flex-start; margin-top: auto; }
 
+.grafico--baixo { height: 260px; }
+.veredito { font-size: 1.35rem; font-weight: 600; margin: 0 0 8px; }
+.testes { padding-left: 1.4em; margin: 16px 0 0; }
+.testes > li { margin-bottom: 20px; }
+.testes h3 { margin: 0 0 4px; }
+.testes p { margin: 0; color: var(--tinta-2); }
+.testes p strong { color: var(--tinta); }
+
 .tabela { margin-top: 8px; font-size: 0.9rem; }
 .tabela summary { cursor: pointer; color: var(--tinta-2); }
 .tabela > div { max-height: 360px; overflow: auto; margin-top: 8px; }

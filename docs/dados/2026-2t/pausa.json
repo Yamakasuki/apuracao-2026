@@ -1,0 +1,91 @@
+{
+ "cidades": [
+  "FEIRA DE SANTANA",
+  "LAURO DE FREITAS",
+  "SALVADOR"
+ ],
+ "uf": "BA",
+ "a": "13",
+ "b": "22",
+ "turno1": {
+  "cidades": {
+   "secoes": 6755,
+   "aptos": 2554981,
+   "comparecimento": 2048569,
+   "margem": 656725
+  },
+  "resto_uf": {
+   "secoes": 28721,
+   "aptos": 8757771,
+   "comparecimento": 7005032,
+   "margem": 2565461
+  },
+  "resto_br": {
+   "secoes": 463731,
+   "aptos": 147432327,
+   "comparecimento": 116222234,
+   "margem": -5447151
+  },
+  "brasil": {
+   "secoes": 499207,
+   "aptos": 158745079,
+   "comparecimento": 125275835,
+   "margem": -2224965
+  }
+ },
+ "turno2": {
+  "cidades": {
+   "secoes": 6755,
+   "aptos": 2554995,
+   "comparecimento": 2161803,
+   "margem": 880607
+  },
+  "resto_uf": {
+   "secoes": 28721,
+   "aptos": 8757896,
+   "comparecimento": 7260244,
+   "margem": 2995890
+  },
+  "resto_br": {
+   "secoes": 463731,
+   "aptos": 147432188,
+   "comparecimento": 118814027,
+   "margem": 553694
+  },
+  "brasil": {
+   "secoes": 499207,
+   "aptos": 158745079,
+   "comparecimento": 128236074,
+   "margem": 4430191
+  }
+ },
+ "antes_da_pausa": {
+  "secoes": 1868,
+  "votos": 502516,
+  "total_secoes": 499207,
+  "total_votos": 128236074
+ },
+ "excesso": 68305,
+ "cenarios": [
+  {
+   "id": "oficial",
+   "margem": 4430191
+  },
+  {
+   "id": "sem_excesso_todos_para_a",
+   "margem": 4361886
+  },
+  {
+   "id": "excesso_todos_para_b",
+   "margem": 4293581
+  },
+  {
+   "id": "sem_cidades",
+   "margem": 3549584
+  },
+  {
+   "id": "sem_uf",
+   "margem": 553694
+  }
+ ]
+}

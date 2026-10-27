@@ -62,10 +62,11 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => dese
 async function carregarEleicao(id) {
   if (!cache.has(id)) {
     const p = `dados/${id}`;
-    const [resumo, linha, municipios] = await Promise.all([
+    const [resumo, linha, municipios, pausa] = await Promise.all([
       json(`${p}/resumo.json`), json(`${p}/linha_do_tempo.json`), json(`${p}/municipios.json`),
+      json(`${p}/pausa.json`).catch(() => null), // só existe no 2º turno
     ]);
-    cache.set(id, { resumo, linha, municipios });
+    cache.set(id, { resumo, linha, municipios, pausa });
   }
   D = cache.get(id);
   estado.id = id;
@@ -203,6 +204,67 @@ function desenharTudo() {
   renderPeriodo();
   atualizarMomento();
   renderNota();
+  renderPausa();
+}
+
+// ---------- a pausa mudou o resultado? ----------
+const ROTULO_GRUPO = { cidades: 'Salvador, Feira de Santana e Lauro de Freitas', resto_uf: 'Resto da Bahia', resto_br: 'Resto do Brasil' };
+const ROTULO_CENARIO = {
+  oficial: 'Resultado oficial',
+  sem_excesso_todos_para_a: 'Sem os eleitores a mais (se todos tivessem votado em Lula)',
+  excesso_todos_para_b: 'Eleitores a mais contados para Flávio (pior caso)',
+  sem_cidades: 'Anulando todas as urnas das 3 cidades',
+  sem_uf: 'Anulando a Bahia inteira',
+};
+
+function renderPausa() {
+  const P = D.pausa;
+  $('#pausa').hidden = !P;
+  if (!P) return;
+  const n = nomes();
+  const taxa = g => (100 * g.comparecimento) / g.aptos;
+  const piores = P.cenarios.filter(c => c.id !== 'oficial');
+  const menor = piores.reduce((x, y) => (y.margem < x.margem ? y : x));
+  const pior = P.cenarios.find(c => c.id === 'excesso_todos_para_b');
+  $('#pausa-veredito').textContent = `Pelos dados, não. Mesmo no pior caso, ${n[P.a]} ainda venceria por ${compacto(pior.margem)} de votos.`;
+  $('#pausa-contexto').textContent = 'No fim da tarde (a ordem chegou aos juízes por volta das 17h18), o STF prorrogou a votação até 19h nas seções ainda abertas, a pedido da coligação de Lula, ' +
+    'por falta de transporte em Salvador, Feira de Santana e Lauro de Freitas (BA). O TSE suspendeu a totalização das 17h07 às 19h. ' +
+    'O argumento de quem perdeu é que os votos desse período decidiram a eleição. Três testes simples com os dados por seção:';
+  const ap = P.antes_da_pausa;
+  $('#pausa-t1').textContent = `Antes da pausa tinham chegado só ${num(ap.secoes)} de ${num(ap.total_secoes)} boletins ` +
+    `(${pct((100 * ap.secoes) / ap.total_secoes, 1)}), a maioria do exterior. Os outros ${pct((100 * (ap.total_secoes - ap.secoes)) / ap.total_secoes, 1)} ` +
+    'chegaram depois das 19h, no Brasil inteiro. Ou seja, "as urnas apuradas depois da pausa" são praticamente todas as urnas do país: a pausa atrasou ' +
+    'a contagem, mas a ordem de chegada não muda a soma final.';
+  const c1 = taxa(P.turno1.cidades);
+  const c2 = taxa(P.turno2.cidades);
+  const r1 = taxa(P.turno1.resto_br);
+  const r2 = taxa(P.turno2.resto_br);
+  $('#pausa-t2').textContent = `Nas três cidades, o comparecimento foi de ${pct(c1, 2)} para ${pct(c2, 2)} (+${(c2 - c1).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} pontos). ` +
+    `No resto do Brasil subiu ${(r2 - r1).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} pontos. A alta foi maior lá, o que combina com a prorrogação. ` +
+    `Mas, descontando a alta que o país inteiro teve, sobram uns ${num(P.excesso)} eleitores a mais: ${pct((100 * P.excesso) / P.cenarios[0].margem, 1)} da vantagem de ${n[P.a]}.`;
+  $('#pausa-t3').textContent = `A vantagem final foi de ${num(P.cenarios[0].margem)} votos. O cenário mais duro, anular a Bahia inteira ` +
+    `(${num(P.turno2.cidades.secoes + P.turno2.resto_uf.secoes)} urnas, não só as que ficaram abertas), ainda deixa ${n[P.a]} ${num(menor.margem)} votos à frente.`;
+  $('#pausa-limite').textContent = 'O limite desta análise: ela não conta exatamente quantos votos foram dados depois das 17h. ' +
+    'Esse dado está no horário de encerramento de cada urna, que vem no boletim de urna (bweb) do 2º turno, ainda não publicado pelo TSE. ' +
+    'Por isso os testes usam tetos: números maiores do que o efeito real pode ter sido.';
+
+  const t = G.tokens();
+  const grupos = ['cidades', 'resto_uf', 'resto_br'];
+  const legenda = $('#legenda-comp');
+  legenda.replaceChildren();
+  for (const [rot, cor] of [['1º turno', t.eixo], ['2º turno', t.tinta2]]) {
+    const li = el('li');
+    li.append(chave(cor, 'chave chave--barra'), rot);
+    legenda.append(li);
+  }
+  grafico('g-comparecimento').setOption(G.opcoesComparecimento(t, {
+    rotulos: grupos.map(g => ROTULO_GRUPO[g]), t1: grupos.map(g => taxa(P.turno1[g])), t2: grupos.map(g => taxa(P.turno2[g])),
+    animar: !semMovimento.matches, estreito: innerWidth < 600,
+  }), true);
+  grafico('g-cenarios').setOption(G.opcoesCenarios(t, {
+    rotulos: P.cenarios.map(c => ROTULO_CENARIO[c.id]), valores: P.cenarios.map(c => c.margem), cor: G.corDe(t, P.a),
+    animar: !semMovimento.matches, estreito: innerWidth < 600,
+  }), true);
 }
 
 function desenharGraficos() {
@@ -514,6 +576,14 @@ function renderTabela(qual) {
       const de = instante(ini, k * D.linha.largura_ritmo);
       return [`${horaDe(de)}–${horaDe(de + D.linha.largura_ritmo * 60000)}`, num(s), num(r[d.a][k]), num(r[d.b][k]), sinal(r[d.a][k] - r[d.b][k])];
     });
+  } else if (qual === 'comparecimento') {
+    cab = ['Grupo', '1º turno', '2º turno', 'Alta (pontos)', 'Urnas'];
+    const taxa = g => (100 * g.comparecimento) / g.aptos;
+    linhas = ['cidades', 'resto_uf', 'resto_br', 'brasil'].map(g => [ROTULO_GRUPO[g] ?? 'Brasil', pct(taxa(D.pausa.turno1[g]), 2),
+      pct(taxa(D.pausa.turno2[g]), 2), (taxa(D.pausa.turno2[g]) - taxa(D.pausa.turno1[g])).toLocaleString('pt-BR', { maximumFractionDigits: 2 }), num(D.pausa.turno2[g].secoes)]);
+  } else if (qual === 'cenarios') {
+    cab = ['Cenário', `Vantagem de ${n[D.pausa.a]}`];
+    linhas = D.pausa.cenarios.map(c => [ROTULO_CENARIO[c.id], sinal(c.margem)]);
   } else {
     cab = ['Estado', '% das urnas', n[d.a], n[d.b], 'Diferença (pontos)', 'Diferença (votos)'];
     const i = estado.i;

@@ -58,6 +58,38 @@
       <div class="destaques" id="destaques"></div>
     </section>
 
+    <section class="cartao pausa" id="pausa" hidden>
+      <h2>A pausa mudou o resultado?</h2>
+      <p class="veredito" id="pausa-veredito"></p>
+      <p id="pausa-contexto"></p>
+      <ol class="testes">
+        <li>
+          <h3>A pausa foi na contagem, não nos votos</h3>
+          <p id="pausa-t1"></p>
+        </li>
+        <li>
+          <h3>Quantos eleitores a mais apareceram onde a prorrogação foi pedida</h3>
+          <p id="pausa-t2"></p>
+          <figure>
+            <figcaption><strong>Comparecimento (% dos aptos)</strong> no 1º e no 2º turno.</figcaption>
+            <ul class="legenda" id="legenda-comp"></ul>
+            <div class="grafico grafico--baixo" id="g-comparecimento"></div>
+            <details class="tabela" data-tabela="comparecimento"><summary>Ver como tabela</summary><div></div></details>
+          </figure>
+        </li>
+        <li>
+          <h3>E se esses votos não valessem?</h3>
+          <p id="pausa-t3"></p>
+          <figure>
+            <figcaption><strong>Vantagem de Lula em cada cenário</strong>, em votos. Em todos ele continua na frente.</figcaption>
+            <div class="grafico grafico--baixo" id="g-cenarios"></div>
+            <details class="tabela" data-tabela="cenarios"><summary>Ver como tabela</summary><div></div></details>
+          </figure>
+        </li>
+      </ol>
+      <p class="nota" id="pausa-limite"></p>
+    </section>
+
     <section class="cartao">
       <h2>Quando os votos entraram</h2>
       <figure>
