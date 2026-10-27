@@ -157,6 +157,5 @@ leu os logs de todas as 499.207 urnas: 34.050 votos depois das 17h no Brasil (+1
 1,11% da vantagem). Cruzando urna por urna com as 11.755 que eu li, 11.742 batem exatamente. As diferenças:
 votos às 17:00:00 em ponto (eu incluo, ele não) e o oeste do Amazonas, que é UTC−5 (eu usei UTC−4 para o estado inteiro).
 
-"35 mil" × "5 mil": 28.737 dos 34.050 votos foram entre 17h00 e 17h05 (fim da fila, normal em toda eleição);
-depois das 17h05 foram 5.313. O [reset-hightide/votos-apos-17h-2t-2026](https://github.com/reset-hightide/votos-apos-17h-2t-2026)
-não recalcula nada: reúne os números da CNN (34.330) e do g1 (35.521).
+"35 mil" × "5 mil": 28.721 dos 34.050 votos foram entre 17h00 e 17h05 (fim da fila, normal em toda eleição);
+depois das 17h05 foram 5.329.
