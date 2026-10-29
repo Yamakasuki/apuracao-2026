@@ -96,10 +96,8 @@
    "depois_2t": 1994,
    "votos_1t": 2019655,
    "depois_1t": 118104,
-   "depois_2t_comparaveis": 1959,
-   "votos_2t_comparaveis": 2133642,
-   "urnas_depois_18h_2t": 221,
-   "urnas_depois_18h_1t": 1168,
+   "estendidas": 867,
+   "votos_estendidas": 742,
    "ultimo_2t": "19:01:48",
    "faixas_1t": [
     26183,
@@ -119,60 +117,57 @@
     625
    ],
    "faixas_2t": [
-    1474,
-    39,
+    1492,
+    42,
     40,
     38,
-    62,
-    49,
-    57,
+    63,
     53,
+    59,
     55,
-    45,
-    27,
+    56,
+    47,
+    29,
     18,
     2,
     0,
     0
-   ],
-   "a_mais": -116145
+   ]
   },
   "amostra_brasil": {
    "urnas": 5000,
    "urnas_comparaveis": 4955,
    "votos_2t": 1278401,
-   "depois_2t": 282,
+   "depois_2t": 273,
    "votos_1t": 1237228,
-   "depois_1t": 35678,
-   "depois_2t_comparaveis": 280,
-   "votos_2t_comparaveis": 1267469,
-   "urnas_depois_18h_2t": 14,
-   "urnas_depois_18h_1t": 360,
+   "depois_1t": 35761,
+   "estendidas": 83,
+   "votos_estendidas": 48,
    "ultimo_2t": "18:57:38",
    "faixas_1t": [
-    8560,
-    6019,
-    4772,
-    3842,
-    3030,
-    2401,
-    1765,
-    1326,
-    1048,
-    777,
-    602,
+    8569,
+    6022,
+    4771,
+    3844,
+    3033,
+    2402,
+    1767,
+    1330,
+    1052,
+    780,
+    599,
     434,
-    301,
-    236,
-    565
+    298,
+    239,
+    621
    ],
    "faixas_2t": [
-    229,
-    12,
+    230,
+    11,
+    1,
+    4,
+    4,
     5,
-    5,
-    5,
-    6,
     3,
     3,
     5,
@@ -182,47 +177,126 @@
     0,
     0,
     0
-   ],
-   "a_mais": -35398
-  },
-  "estimativa_resto_brasil": {
-   "votos": 126074271,
-   "depois_2t": 27851,
-   "a_mais": -3607758
+   ]
   }
  },
  "brasil_apos_17h": {
-  "brasil": 34050,
-  "exterior": 10865,
-  "janela_min": 5,
-  "faixas": [
-   28721,
-   1131,
-   347,
-   247,
-   188,
-   197,
-   182,
-   206,
-   207,
-   219,
-   198,
-   214,
-   232,
-   216,
-   229,
-   236,
-   213,
-   168,
-   177,
-   153,
-   124,
-   111,
-   80,
-   43,
-   9,
-   2,
-   0
-  ]
+  "urnas": 497882,
+  "votos_total": 127696482,
+  "brasil": 34330,
+  "por_uf": {
+   "AC": {
+    "estendidas": 1,
+    "votos": 0
+   },
+   "AL": {
+    "estendidas": 3,
+    "votos": 42
+   },
+   "AM": {
+    "estendidas": 3,
+    "votos": 6
+   },
+   "BA": {
+    "estendidas": 1014,
+    "votos": 842
+   },
+   "CE": {
+    "estendidas": 6,
+    "votos": 6
+   },
+   "DF": {
+    "estendidas": 19,
+    "votos": 4
+   },
+   "ES": {
+    "estendidas": 2,
+    "votos": 2
+   },
+   "GO": {
+    "estendidas": 3,
+    "votos": 33
+   },
+   "MA": {
+    "estendidas": 6,
+    "votos": 14
+   },
+   "MG": {
+    "estendidas": 8,
+    "votos": 16
+   },
+   "MT": {
+    "estendidas": 10,
+    "votos": 5
+   },
+   "PA": {
+    "estendidas": 10,
+    "votos": 5
+   },
+   "PB": {
+    "estendidas": 312,
+    "votos": 140
+   },
+   "PE": {
+    "estendidas": 705,
+    "votos": 296
+   },
+   "PI": {
+    "estendidas": 11,
+    "votos": 2
+   },
+   "PR": {
+    "estendidas": 1,
+    "votos": 1
+   },
+   "RJ": {
+    "estendidas": 3301,
+    "votos": 1966
+   },
+   "RN": {
+    "estendidas": 3,
+    "votos": 7
+   },
+   "RO": {
+    "estendidas": 1,
+    "votos": 0
+   },
+   "RS": {
+    "estendidas": 5,
+    "votos": 17
+   },
+   "SE": {
+    "estendidas": 54,
+    "votos": 22
+   },
+   "SP": {
+    "estendidas": 1874,
+    "votos": 1626
+   }
+  },
+  "cortes": [
+   {
+    "corte": "17:00",
+    "urnas": 497882,
+    "votos": 34330
+   },
+   {
+    "corte": "17:15",
+    "urnas": 9079,
+    "votos": 5621
+   },
+   {
+    "corte": "17:30",
+    "urnas": 7606,
+    "votos": 5139
+   },
+   {
+    "corte": "17:45",
+    "urnas": 7352,
+    "votos": 5052
+   }
+  ],
+  "estendidas": 7352,
+  "votos_estendidas": 5052
  }
 }

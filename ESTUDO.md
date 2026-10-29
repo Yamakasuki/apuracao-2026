@@ -142,20 +142,18 @@ que serve de comparação (`pipeline/logs_urna.py` e `pipeline/pausa.py`).
 
 - Nas 6.755 urnas de Salvador, Feira de Santana e Lauro de Freitas: **1.994 votos depois das 17h** no 2º turno
   (485 depois das 17h10; último às 19:01). Nas mesmas urnas, no 1º turno, foram 118.104.
-- No país todo, o g1 contou 35.521 votos depois das 17h (CNN: 34.330); a amostra de 5 mil urnas projeta uns 28 mil fora das três cidades.
-- 35.521 votos são 0,80% da vantagem de Lula (4.430.191). Mesmo se todos virassem votos do Flávio, Lula venceria por 4.359.149.
+- No país todo foram 34.330 votos depois das 17h; só 5.052 em urnas que fecharam depois das 17h45 (usaram a prorrogação).
+- 34.330 votos são 0,77% da vantagem de Lula (4.430.191). Mesmo se todos virassem votos do Flávio, Lula venceria por 4.361.531.
 - Os dois lados pediram prorrogação: a coligação de Lula (falta de ônibus na Bahia) e a campanha de Flávio Bolsonaro (chuvas no Sul e no Sudeste).
   As fontes estão no topo do site.
 
 Para refazer: `python pipeline/logs_urna.py` (baixa ~1,6 GB de logs, uns 15 minutos) e `python pipeline/pausa.py`.
 O `.jez` é um 7z; o `tar` do Windows 10/11 abre (`tar -xOf arquivo.jez`).
 
-### Comparação com outras análises
+### Comparação com outra análise
 
-O repositório [furtado0x/eleicoes-2026-votos-apos-17h](https://github.com/furtado0x/eleicoes-2026-votos-apos-17h)
-leu os logs de todas as 499.207 urnas: 34.050 votos depois das 17h no Brasil (+10.865 no exterior; pior caso 49.254,
-1,11% da vantagem). Cruzando urna por urna com as 11.755 que eu li, 11.742 batem exatamente. As diferenças:
-votos às 17:00:00 em ponto (eu incluo, ele não) e o oeste do Amazonas, que é UTC−5 (eu usei UTC−4 para o estado inteiro).
-
-"35 mil" × "5 mil": 28.721 dos 34.050 votos foram entre 17h00 e 17h05 (fim da fila, normal em toda eleição);
-depois das 17h05 foram 5.329.
+O repositório [apolinario/urnas-tardias](https://github.com/apolinario/urnas-tardias) leu o log de todas as urnas do país,
+com a mesma fonte e o mesmo método (fuso de cada município pela hora de abertura, voto às 17:00:00 ou depois, exterior fora).
+Cruzando urna por urna com as 11.755 que eu li, o número de votos depois das 17h e a classificação de urna estendida
+batem em todas. Por isso o número do Brasil inteiro no site vem dele: 34.330 votos depois das 17h em todas as urnas e
+5.052 nas 7.352 urnas que fecharam depois das 17h45. As decisões de método e o efeito de cada uma estão no README.

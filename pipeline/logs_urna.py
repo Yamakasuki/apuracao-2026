@@ -1,10 +1,8 @@
-"""Quantos votos foram dados depois das 17h? Conta direto no log de cada urna.
+"""Lê o log de cada urna: abertura, encerramento e horário de cada voto da tarde, nos dois turnos.
 
 O log da urna (arquivo .jez, que é um 7z) registra cada voto com data e hora ("O voto do eleitor foi
-computado"). A urna é a mesma nos dois turnos e o log é cumulativo, então o mesmo arquivo dá:
-- votos depois do fechamento no 1º turno (fila normal, sem prorrogação);
-- votos depois do fechamento no 2º turno (fila + prorrogação até 19h).
-A diferença entre os dois é o efeito da prorrogação.
+computado"). A urna é a mesma nos dois turnos e o log é cumulativo, então o mesmo arquivo traz os dois turnos.
+Os horários estão no relógio local da urna; a conversão para Brasília é feita no pausa.py.
 
 Os arquivos ficam em resultados.tse.jus.br/oficial/ele2026/arquivo-urna/3221/... (uma seção por pedido).
 Grupos: todas as urnas de Salvador, Feira de Santana e Lauro de Freitas + amostra aleatória do resto do país.
@@ -24,32 +22,32 @@ import pausa
 
 BASE = "https://resultados.tse.jus.br/oficial/ele2026/arquivo-urna/3221/dados/{uf}/{mun}/{zona}/{secao}/"
 DATAS = {"04/10/2026": "1", "25/10/2026": "2"}
-# o log está no horário local da urna; a votação fecha às 17h de Brasília
-FECHAMENTO_LOCAL = {"AM": 16, "MT": 16, "MS": 16, "RO": 16, "RR": 16, "AC": 15}
+TARDE = "13:00:00"  # guarda os votos a partir daqui (hora local): cobre 17h de Brasília em qualquer fuso do país
 AMOSTRA = 5000
 TAR = r"C:\Windows\System32\tar.exe"  # o tar do Windows 10/11 abre 7z
+COLUNAS = ["uf", "cd_municipio", "municipio", "zona", "secao", "grupo"] + [
+    f"{c}_{t}t" for t in ("1", "2") for c in ("votos", "abertura", "encerramento", "tarde")]
 
 
-FAIXAS = 15  # janelas de 10 min depois do fechamento; a última junta tudo a partir de 2h20
-
-
-def contar(log, fechamento):
-    """Votos, votos a partir do fechamento, último voto e votos por janela de 10 min depois do fechamento."""
-    r = {t: {"votos": 0, "depois": 0, "ultimo": None, "faixas": [0] * FAIXAS} for t in DATAS.values()}
+def contar(log):
+    """Por turno: total de votos, abertura, encerramento e horários (locais) dos votos da tarde."""
+    r = {t: {"votos": 0, "abertura": None, "encerramento": None, "tarde": []} for t in DATAS.values()}
     for linha in log.split(b"\n"):
-        if b"O voto do eleitor foi computado" not in linha:
+        if linha[2:3] != b"/" or linha[10:11] != b" ":  # só linhas que começam com "dd/mm/aaaa hh:mm:ss"
             continue
         data, hora = linha[:19].decode("latin-1").split(" ")
         turno = DATAS.get(data)
         if not turno:
             continue
         t = r[turno]
-        t["votos"] += 1
-        minutos = (int(hora[:2]) - fechamento) * 60 + int(hora[3:5])
-        if minutos >= 0:
-            t["depois"] += 1
-            t["faixas"][min(minutos // 10, FAIXAS - 1)] += 1
-        t["ultimo"] = hora
+        if b"O voto do eleitor foi computado" in linha:
+            t["votos"] += 1
+            if hora >= TARDE:
+                t["tarde"].append(hora)
+        elif b"Urna pronta para receber votos" in linha and t["abertura"] is None:
+            t["abertura"] = hora
+        elif b"Procedimento de encerramento confirmado" in linha:
+            t["encerramento"] = hora
     return r
 
 
@@ -76,10 +74,10 @@ def log_da_secao(u, pasta):
         parcial.write_bytes(baixar(base + f"{h['hash']}/{nome}"))
         parcial.replace(arquivo)
     log = subprocess.run([TAR, "-xOf", str(arquivo)], capture_output=True, check=True).stdout
-    r = contar(log, FECHAMENTO_LOCAL.get(u["uf"], 17))
+    r = contar(log)
     return [u["uf"], u["cd_municipio"], u["municipio"], u["zona"], u["secao"], u["grupo"]] + [
-        r[t][c] for t in ("1", "2") for c in ("votos", "depois", "ultimo")] + [
-        " ".join(map(str, r[t]["faixas"])) for t in ("1", "2")]
+        ";".join(r[t][c]) if c == "tarde" else ("" if r[t][c] is None else r[t][c])
+        for t in ("1", "2") for c in ("votos", "abertura", "encerramento", "tarde")]
 
 
 def escolher(urnas):
@@ -90,10 +88,8 @@ def escolher(urnas):
 
 
 def main():
-    import analisar
-    urnas = analisar.ler(config.PROCESSADOS / "secoes_2026_2t.csv")
-    for u, bruta in zip(urnas, csv.DictReader(open(config.PROCESSADOS / "secoes_2026_2t.csv", encoding="utf-8"))):
-        u["zona"], u["secao"] = bruta["zona"], bruta["secao"]
+    with open(config.PROCESSADOS / "secoes_2026_2t.csv", encoding="utf-8", newline="") as f:
+        urnas = list(csv.DictReader(f))
     escolhidas = escolher(urnas)
     pasta = config.BRUTOS / "2026" / "logs"
     pasta.mkdir(parents=True, exist_ok=True)
@@ -111,8 +107,7 @@ def main():
     destino = config.PROCESSADOS / "logs_2026_2t.csv"
     with open(destino, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["uf", "cd_municipio", "municipio", "zona", "secao", "grupo",
-                    "votos_1t", "depois_1t", "ultimo_1t", "votos_2t", "depois_2t", "ultimo_2t", "faixas_1t", "faixas_2t"])
+        w.writerow(COLUNAS)
         w.writerows(linhas)
     print(f"\n{len(linhas)} urnas lidas, {falhas} falhas -> {destino}")
 

@@ -39,32 +39,49 @@ class TestPausa(unittest.TestCase):
         self.assertEqual(r, {"secoes": 1, "votos": 5, "total_secoes": 2, "total_votos": 13})
 
 
+def log(grupo, uf, mun, abertura, v1, tarde1, v2, tarde2, encerramento="17:02:00"):
+    return {"grupo": grupo, "uf": uf, "cd_municipio": mun, "votos_1t": str(v1), "tarde_1t": tarde1,
+            "abertura_2t": abertura, "encerramento_2t": encerramento, "votos_2t": str(v2), "tarde_2t": tarde2}
+
+
 class TestResumoLogs(unittest.TestCase):
-    def test_compara_so_urnas_com_os_dois_turnos(self):
-        def linha(grupo, v1, d1, v2, d2, f1="0 0 0 0 0 0 0", f2="0 0 0 0 0 0 0"):
-            return {"grupo": grupo, "votos_1t": str(v1), "depois_1t": str(d1), "votos_2t": str(v2), "depois_2t": str(d2),
-                    "ultimo_2t": "18:10:00", "faixas_1t": f1, "faixas_2t": f2}
-        linhas = [linha("cidades", 300, 5, 310, 40, "5 0 0 0 0 0 0", "10 10 10 0 0 0 10"),
-                  linha("cidades", 0, 0, 200, 30)]  # urna trocada: não entra na comparação
+    def test_fuso_do_municipio_pela_abertura(self):
+        # duas urnas do mesmo município abrem às 07h locais: o relógio local está 1h atrás de Brasília
+        linhas = [log("amostra", "AM", "1", "07:00:01", 10, "", 10, "16:00:00;16:30:00", encerramento="16:50:00"),
+                  log("amostra", "AM", "1", "07:00:05", 10, "", 10, "15:59:59", encerramento="16:02:00")]
+        self.assertEqual(pausa.fusos(linhas), {("AM", "1"): -1})
+        g = pausa.resumo_logs(linhas)["amostra"]
+        self.assertEqual(g["depois_2t"], 2)  # 17:00:00 e 17:30:00 de Brasília
+        self.assertEqual((g["estendidas"], g["votos_estendidas"]), (1, 2))  # fechou às 17h50 de Brasília
+        self.assertEqual(g["faixas_2t"][:4], [1, 0, 0, 1])
+        self.assertEqual(g["ultimo_2t"], "17:30:00")
+
+    def test_urna_trocada_fica_fora_so_da_comparacao(self):
+        linhas = [log("cidades", "BA", "2", "08:00:01", 300, "17:10:00", 310, "17:01:00"),
+                  log("cidades", "BA", "2", "08:00:02", 0, "", 200, "17:03:00")]
         g = pausa.resumo_logs(linhas)["cidades"]
         self.assertEqual((g["urnas"], g["urnas_comparaveis"]), (2, 1))
-        self.assertEqual((g["depois_2t"], g["depois_1t"], g["a_mais"]), (70, 5, 35))
-        self.assertEqual(g["faixas_2t"], [10, 10, 10, 0, 0, 0, 10])
-        self.assertEqual((g["urnas_depois_18h_2t"], g["urnas_depois_18h_1t"]), (1, 0))
+        self.assertEqual((g["depois_2t"], g["depois_1t"]), (2, 1))
 
 
-class TestFaixasBrasil(unittest.TestCase):
-    def test_converte_fuso_e_separa_exterior(self):
-        linhas = [
-            {"uf": "sp", "delta_h": "0.0", "log_horarios_apos_corte": "170000;170001;170630"},   # 17:00:00 não conta
-            {"uf": "am", "delta_h": "-1.0", "log_horarios_apos_corte": "160200;155900"},          # 17:02 e 16:59 de Brasília
-            {"uf": "zz", "delta_h": "-4.0", "log_horarios_apos_corte": "130500"},                 # 17:05 de Brasília
-            {"uf": "rj", "delta_h": "", "log_horarios_apos_corte": "191500"},                     # cai na última janela
-        ]
-        r = pausa.faixas_brasil(linhas)
-        self.assertEqual((r["brasil"], r["exterior"]), (4, 1))
-        self.assertEqual(r["faixas"][:2], [2, 1])
-        self.assertEqual(r["faixas"][-1], 1)
+class TestFusos(unittest.TestCase):
+    def test_urna_que_abriu_atrasada_nao_define_o_fuso(self):
+        linhas = [log("x", "PR", "9", "09:25:07", 1, "", 1, ""),     # única urna do município, abriu atrasada
+                  log("x", "PR", "8", "08:00:01", 1, "", 1, ""),
+                  log("x", "PR", "7", "08:02:00", 1, "", 1, "")]
+        self.assertEqual(pausa.fusos(linhas)[("PR", "9")], 0)  # cai no fuso mais comum do estado
+
+
+class TestBrasilInteiro(unittest.TestCase):
+    def test_todas_as_urnas_e_so_as_estendidas(self):
+        def linha(uf, enc, v):
+            return {"uf": uf, "encerramento_brt": enc, "votos_apos_17h": str(v), "votos_total": "300"}
+        linhas = [linha("SP", "17:01:00", 5), linha("RJ", "17:20:00", 2), linha("RJ", "18:59:00", 3), linha("ZZ", "21:00:00", 9)]
+        r = pausa.brasil_inteiro(linhas)
+        self.assertEqual((r["urnas"], r["brasil"]), (3, 10))
+        self.assertEqual((r["estendidas"], r["votos_estendidas"]), (1, 3))
+        self.assertEqual([c["votos"] for c in r["cortes"]], [10, 5, 3, 3])
+        self.assertEqual(r["por_uf"], {"RJ": {"estendidas": 1, "votos": 3}})
 
 
 if __name__ == "__main__":

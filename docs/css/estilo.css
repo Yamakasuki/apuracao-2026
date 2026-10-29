@@ -68,6 +68,8 @@ select, input[type="search"] {
   font: inherit; font-size: 0.95rem; cursor: pointer; color: var(--superficie); background: var(--tinta);
   border: 0; border-radius: 6px; padding: 6px 12px;
 }
+.topo__acoes { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+a.botao { text-decoration: none; display: inline-block; }
 .botao--leve { color: var(--tinta); background: transparent; border: 1px solid var(--borda); }
 
 main { display: grid; gap: 16px; padding-top: 16px; padding-bottom: 32px; }

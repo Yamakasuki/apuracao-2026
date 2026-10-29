@@ -15,7 +15,10 @@
       <h1>Apuração 2026 · Presidente</h1>
       <p class="sub">A contagem dos votos minuto a minuto, refeita com os boletins de urna do TSE.</p>
     </div>
-    <button id="tema" class="botao botao--leve" type="button" aria-label="Alternar tema claro ou escuro">Tema</button>
+    <div class="topo__acoes">
+      <a class="botao botao--leve" href="https://github.com/Yamakasuki/apuracao-2026" rel="noopener">Código no GitHub</a>
+      <button id="tema" class="botao botao--leve" type="button" aria-label="Alternar tema claro ou escuro">Tema</button>
+    </div>
   </header>
 
   <div class="barra" role="region" aria-label="Filtros e reprodução">
@@ -161,14 +164,16 @@
         <li><strong>Juntar.</strong> O script lê os zips em streaming, sem descompactar no disco, e junta os dois arquivos pela chave estado + município + zona + seção. Sai uma linha por urna.</li>
         <li><strong>Ordenar no tempo.</strong> Cada seção tem o horário em que o boletim de urna chegou ao TSE (<code>DT_RECEBIMENTO_BU_HOR_TSE</code>, horário de Brasília). Ordenando as urnas por esse horário e somando os votos, dá para refazer a apuração minuto a minuto.</li>
         <li><strong>Analisar.</strong> Com os acumulados saem a virada, o maior pico de vantagem de cada lado, a janela de 10 minutos com maior arrancada e o momento em que a vantagem passou dos eleitores das urnas que faltavam.</li>
-        <li><strong>Mostrar.</strong> O resultado vira JSON pequeno que esta página lê. O código e o passo a passo estão no repositório.</li>
+        <li><strong>Conferir.</strong> Os votos de cada candidato, os aptos e o comparecimento batem com o resultado oficial do TSE; as viradas e o horário da definição batem com o que foi noticiado.</li>
+        <li><strong>Votos depois das 17h.</strong> O log de cada urna registra o horário de cada voto, a abertura e o encerramento. O horário local vira horário de Brasília pelo fuso de cada município, descoberto pela hora em que as urnas abriram. O número do Brasil inteiro vem do repositório <a href="https://github.com/apolinario/urnas-tardias" rel="noopener">apolinario/urnas-tardias</a>, conferido urna por urna com as 11.755 urnas lidas aqui.</li>
+        <li><strong>Mostrar.</strong> O resultado vira JSON pequeno que esta página lê. O código e o passo a passo estão em <a href="https://github.com/Yamakasuki/apuracao-2026" rel="noopener">github.com/Yamakasuki/apuracao-2026</a>.</li>
       </ol>
       <p class="nota" id="nota-dados"></p>
     </section>
   </main>
 
   <footer class="rodape">
-    Dados: Tribunal Superior Eleitoral (boletins de urna). Mapa: IBGE. Horários de Brasília.
+    Dados: Tribunal Superior Eleitoral (boletins de urna). Mapa: IBGE. Horários de Brasília. Código e passo a passo: <a href="https://github.com/Yamakasuki/apuracao-2026" rel="noopener">github.com/Yamakasuki/apuracao-2026</a>.
   </footer>
 </body>
 </html>

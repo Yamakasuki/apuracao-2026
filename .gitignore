@@ -5,3 +5,6 @@
 __pycache__/
 *.pyc
 .venv/
+
+# Rascunho de post (só local)
+POST.md

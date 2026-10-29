@@ -31,19 +31,52 @@ quando a votação foi prorrogada.
 
 O detalhe de cada etapa, as armadilhas dos arquivos e as contas estão no [ESTUDO.md](ESTUDO.md).
 
-## Votos depois das 17h no 2º turno: de onde vem o número do Brasil inteiro
+## Votos depois das 17h no 2º turno
 
-Eu li os logs das três cidades da Bahia e de uma amostra. Quem leu **todas as 499.207 urnas** foi o repositório
-[furtado0x/eleicoes-2026-votos-apos-17h](https://github.com/furtado0x/eleicoes-2026-votos-apos-17h). Ele usou a mesma
-fonte (log, boletim de urna e assinaturas de cada urna no site do TSE) e chegou a **34.050 votos depois das 17h no Brasil**,
-mais 10.865 no exterior. O site usa esse arquivo para o gráfico do Brasil inteiro.
+**Resultado:** em todas as urnas do país, **34.330 pessoas votaram depois das 17h**. Só **7.352 urnas** (1,48%) ficaram
+abertas além das 17h45, ou seja, usaram de fato a prorrogação, e nelas entraram **5.052 votos** depois das 17h.
+A vantagem de Lula foi de 4.430.191 votos. Mesmo pegando os 34.330 e passando todos de Lula para Flávio Bolsonaro,
+Lula venceria por 4.361.531.
 
-Cruzei urna por urna com o que eu tinha lido: das 11.755 urnas, 11.742 dão exatamente o mesmo número. As diferenças
-são votos às 17:00:00 em ponto (eu contava, ele não) e o oeste do Amazonas, que é UTC−5.
+| Recorte | Urnas | Votos depois das 17h | % da vantagem de Lula |
+|---|---:|---:|---:|
+| Todas as urnas | 497.882 | 34.330 | 0,77% |
+| Urnas que fecharam depois das 17h15 | 9.079 | 5.621 | 0,13% |
+| Urnas que fecharam depois das 17h30 | 7.606 | 5.139 | 0,12% |
+| Urnas que fecharam depois das 17h45 | 7.352 | 5.052 | 0,11% |
 
-Por que uns falam em ~35 mil e outros em ~5 mil: dos 34.050 votos, 28.721 foram entre 17h00 e 17h05, o fim da fila de quem
-já estava no local, o que acontece em toda eleição. Depois das 17h05 foram 5.329. A CNN contou 34.330 e o g1 35.521;
-a diferença entre eles é de método.
+A diferença entre "35 mil" e "5 mil", que aparece nas notícias, é só de recorte: quase todo voto depois das 17h é de quem
+já estava na fila, o que acontece em toda eleição, e essas urnas fecham poucos minutos depois.
+
+### De onde vem o número do Brasil inteiro
+
+Eu li os logs de todas as 6.755 urnas de Salvador, Feira de Santana e Lauro de Freitas (onde a prorrogação foi pedida) e
+de uma amostra de 5 mil urnas do resto do país. O número do país inteiro vem do repositório
+[apolinario/urnas-tardias](https://github.com/apolinario/urnas-tardias), que leu o log de todas as urnas com a mesma
+fonte (o site de resultados do TSE) e o mesmo método. Antes de usar, cruzei urna por urna: nas 11.755 urnas que eu li,
+**o número de votos depois das 17h e a classificação de urna estendida batem em todas**. Nas três cidades, os dois dão 1.994.
+
+### Decisões de método (e quanto cada uma muda)
+
+Nenhuma delas chega perto de mudar a conclusão. A maior diferença possível entre elas é de algumas centenas de votos,
+contra uma vantagem de 4,4 milhões.
+
+- **Horário do voto, não da chegada do boletim.** Para a linha do tempo da apuração uso a hora em que o boletim chegou
+  ao TSE. Para "votou depois das 17h" uso a hora de cada voto no log da urna. São coisas diferentes: a pausa de 17h07 às
+  19h foi na contagem, não na votação.
+- **Fuso horário.** O log registra o relógio local da urna. No começo eu usei um fuso fixo por estado, e errei três urnas:
+  Fernando de Noronha (UTC−2) e duas do oeste do Amazonas (UTC−5). Passei a descobrir o fuso de cada município pela hora em
+  que as urnas abriram, porque toda urna abre às 8h de Brasília. Com isso a diferença para o apolinario zerou.
+- **17:00:00 em ponto conta.** Conto votos às 17:00:00 ou depois. Contando só depois de 17:00:00, o total cai para 34.050
+  (umas 280 a menos). É o que explica parte da diferença entre as contagens publicadas (34.050, 34.330, 35.521).
+- **O que é "urna estendida".** Uma urna que fecha às 17h03 só atendeu a fila. Considero que usou a prorrogação se fechou
+  depois das 17h45. Mudando o corte para 17h15 ou 17h30, o número vai de 5.052 para no máximo 5.621.
+- **Exterior fora.** No exterior a votação vai até as 17h do horário local de cada cidade, que nas Américas cai depois das
+  17h de Brasília sem ter nada a ver com a prorrogação.
+- **Urnas trocadas entre os turnos.** Em cerca de 1% das urnas o log não traz o 1º turno (a urna foi substituída); elas
+  ficam fora só da comparação entre turnos.
+- **Seções não instaladas e nulo técnico.** O TSE conta 41 seções do exterior que não foram instaladas como "totalizadas";
+  eu deixo de fora (não têm voto). No 1º turno, os 5.246 votos do nº 28 são nulos técnicos, como no resultado oficial.
 
 ## Como rodar
 
